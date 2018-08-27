@@ -23,6 +23,9 @@ import com.robynandcory.bonvoyage.data.TravelDbHelper;
  * Current app contains a single SQLite table to store inventory information for a travel store.
  * UI to be completed in phase 2 of the project.
  *
+ * References:
+ * https://github.com/udacity/ud845-Pets
+ *
  * Icons paid use from https://gumroad.com/d/302e27c9605ad25705945f65e006e1a4
  */
 
