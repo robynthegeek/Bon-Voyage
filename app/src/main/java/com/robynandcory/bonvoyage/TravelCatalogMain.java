@@ -18,6 +18,7 @@ import com.robynandcory.bonvoyage.data.TravelDbHelper;
 
 
 /**
+ * Project 8 for Udacity ABND
  * Icons paid use from https://gumroad.com/d/302e27c9605ad25705945f65e006e1a4
  */
 public class TravelCatalogMain extends AppCompatActivity {
@@ -28,10 +29,11 @@ public class TravelCatalogMain extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_travel_catalog_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        // Add button per material guidelines for new inventory items.
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -49,6 +51,11 @@ public class TravelCatalogMain extends AppCompatActivity {
     private void testWriteTravelDB() {
         mDbHelper = new TravelDbHelper(this);
         SQLiteDatabase wDB = mDbHelper.getWritableDatabase();
+
+        // Clear DB by deleting all entries before adding new test data
+        wDB.delete(TravelContract.TravelEntry.TABLE_NAME,null,null);
+
+        // Adds 3 rows of test data
         ContentValues contentValues = new ContentValues();
         contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, "Travel Backpack");
         contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 125.99);
@@ -58,6 +65,8 @@ public class TravelCatalogMain extends AppCompatActivity {
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, "Osprey");
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "503.555.1234");
 
+        wDB.insert(TravelContract.TravelEntry.TABLE_NAME, null, contentValues);
+
         contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, "Travel Shampoo");
         contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 2.99);
         contentValues.put(TravelContract.TravelEntry.COLUMN_QUANTITY, 8);
@@ -65,6 +74,8 @@ public class TravelCatalogMain extends AppCompatActivity {
         contentValues.put(TravelContract.TravelEntry.COLUMN_SEASON, TravelContract.TravelEntry.COLUMN_ITEM_SEASON_ALLSEASON);
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, "Suave");
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "503.555.1384");
+
+        wDB.insert(TravelContract.TravelEntry.TABLE_NAME, null, contentValues);
 
         contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, "IceBreaker T-Shirt");
         contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 45.99);
@@ -81,22 +92,81 @@ public class TravelCatalogMain extends AppCompatActivity {
 
     private void testReadTravelDB() {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-//        String[] projection = {
-//                TravelContract.TravelEntry._ID,
-//                TravelContract.TravelEntry.COLUMN_NAME,
-//                TravelContract.TravelEntry.COLUMN_PRICE,
-//                TravelContract.TravelEntry.COLUMN_QUANTITY,
-//                TravelContract.TravelEntry.COLUMN_SUPPLIER,
-//                TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE,
-//        };
-        Cursor cursor = db.rawQuery(
-                "SELECT * FROM " + TravelContract.TravelEntry.TABLE_NAME, null);
+        String[] projection = {
+                TravelContract.TravelEntry._ID,
+                TravelContract.TravelEntry.COLUMN_NAME,
+                TravelContract.TravelEntry.COLUMN_PRICE,
+                TravelContract.TravelEntry.COLUMN_QUANTITY,
+                TravelContract.TravelEntry.COLUMN_CATEGORY,
+                TravelContract.TravelEntry.COLUMN_SEASON,
+                TravelContract.TravelEntry.COLUMN_SUPPLIER,
+                TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE,
+        };
+        // Query selects all results from current inventory of test data
+        Cursor cursor = db.query(
+                TravelContract.TravelEntry.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        //Locate test textViews
+        TextView rowCountView = findViewById(R.id.row_count);
+        TextView testQueryView = findViewById(R.id.test_query);
+
+
         try {
-            TextView testQueryView = (TextView) findViewById(R.id.test_query);
-            testQueryView.setText("There are currently " + cursor.getCount() + " items in your inventory.");
+            rowCountView.setText("There are currently " + cursor.getCount() + " items in your inventory.");
+            testQueryView.setText("Inventory Contains: ");
+            testQueryView.append(TravelContract.TravelEntry._ID + " - " +
+                    TravelContract.TravelEntry.COLUMN_NAME + " - " +
+                    TravelContract.TravelEntry.COLUMN_PRICE + " - " +
+                    TravelContract.TravelEntry.COLUMN_QUANTITY + " - " +
+                    TravelContract.TravelEntry.COLUMN_CATEGORY + " - " +
+                    TravelContract.TravelEntry.COLUMN_SEASON + " - " +
+                    TravelContract.TravelEntry.COLUMN_SUPPLIER + " - " +
+                    TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE + "\n");
+
+            int idColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry._ID);
+            int nameColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_NAME);
+            int priceColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_PRICE);
+            int quantityColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_QUANTITY);
+            int categoryColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_CATEGORY);
+            int seasonColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_SEASON);
+            int supplierColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_SUPPLIER);
+            int supplierPhoneColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE);
+
+            while (cursor.moveToNext()) {
+                int currentID = cursor.getInt(idColumnIndex);
+                String currentName = cursor.getString(nameColumnIndex);
+                long currentPrice = cursor.getLong(priceColumnIndex);
+                int currentQuantity = cursor.getInt(quantityColumnIndex);
+                int currentCategory = cursor.getInt(categoryColumnIndex);
+                int currentSeason = cursor.getInt(seasonColumnIndex);
+                String currentSupplier = cursor.getString(supplierColumnIndex);
+                String currentSupplierPhone = cursor.getString(supplierPhoneColumnIndex);
+                testQueryView.append(("\n" + currentID + " - " +
+                currentName + " - " +
+                currentPrice + " - " +
+                currentQuantity + " - " +
+                currentCategory + " - " +
+                currentSeason + " - " +
+                currentSupplier + " - " +
+                currentSupplierPhone));
+            }
+
         } finally {
             cursor.close();
         }
+//                "SELECT * FROM " + TravelContract.TravelEntry.TABLE_NAME, null);
+//        try {
+//            TextView testQueryView = (TextView) findViewById(R.id.test_query);
+//            testQueryView.setText("There are currently " + cursor.getCount() + " items in your inventory.");
+//        } finally {
+//            cursor.close();
+//        }
 //                TravelContract.TravelEntry.TABLE_NAME,
 //                projection,
 //                null,
