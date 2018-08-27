@@ -42,12 +42,12 @@ public class TravelContract {
         /**
          * possible values for category
          */
-        public static final int UNKNOWN = 0;
-        public static final int TECHNOLOGY = 1;
-        public static final int CLOTHING = 2;
-        public static final int TOILETRIES = 3;
-        public static final int ACCESSORIES = 4;
-        public static final int LUGGAGE = 5;
+        public static final int COLUMN_ITEM_CATEGORY_UNKNOWN = 0;
+        public static final int COLUMN_ITEM_CATEGORY_TECHNOLOGY = 1;
+        public static final int COLUMN_ITEM_CATEGORY_CLOTHING = 2;
+        public static final int COLUMN_ITEM_CATEGORY_TOILETRIES = 3;
+        public static final int COLUMN_ITEM_CATEGORY_ACCESSORIES = 4;
+        public static final int COLUMN_ITEM_CATEGORY_LUGGAGE = 5;
         //public static final int DOCUMENTS = ?;
         //public static final int OUTDOOR = ?;
 
