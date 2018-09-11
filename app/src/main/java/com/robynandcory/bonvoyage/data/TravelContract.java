@@ -11,7 +11,7 @@ public class TravelContract {
     private TravelContract() {
     }
 
-    public static final String CONTENT_AUTHORITY = "content://com.robynandcory.bonvoyage.travel/travel";
+    public static final String CONTENT_AUTHORITY = "com.robynandcory.bonvoyage";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_TRAVEL = "travel";
 

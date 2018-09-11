@@ -3,8 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.robynandcory.bonvoyage.TravelCatalogMain">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:id="@+id/action_insert_test_set"
+        android:title="@string/insert_test_data"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_delete_all_entries"
+        android:title="@string/delete_all_data"
         app:showAsAction="never" />
 </menu>

@@ -3,11 +3,13 @@ package com.robynandcory.bonvoyage;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +34,8 @@ import com.robynandcory.bonvoyage.data.TravelDbHelper;
 public class TravelCatalogMain extends AppCompatActivity {
 
     private TravelDbHelper mDbHelper;
+    public static final String LOG_TAG = TravelCatalogMain.class.getSimpleName();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +56,7 @@ public class TravelCatalogMain extends AppCompatActivity {
         //Inserts single entry to test DB, for debugging and grading only.
         testWriteTravelDB();
         //reads from DB and displays in textView on the screen.  For debugging and grading only.
-        testReadTravelDB();
+        displayTravelDb();
     }
 
     /**
@@ -68,7 +72,7 @@ public class TravelCatalogMain extends AppCompatActivity {
 
         // Adds 3 rows of test data
         ContentValues contentValues = new ContentValues();
-        contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, "Travel Backpack");
+        contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, "Travel Bag");
         contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 125.99);
         contentValues.put(TravelContract.TravelEntry.COLUMN_QUANTITY, 5);
         contentValues.put(TravelContract.TravelEntry.COLUMN_CATEGORY, TravelContract.TravelEntry.COLUMN_ITEM_CATEGORY_LUGGAGE);
@@ -76,7 +80,7 @@ public class TravelCatalogMain extends AppCompatActivity {
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, "Osprey");
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "503.555.1234");
 
-        wDB.insert(TravelContract.TravelEntry.TABLE_NAME, null, contentValues);
+        Uri newUri = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
 
         contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, "Travel Shampoo");
         contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 2.99);
@@ -86,7 +90,7 @@ public class TravelCatalogMain extends AppCompatActivity {
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, "Suave");
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "503.555.1384");
 
-        wDB.insert(TravelContract.TravelEntry.TABLE_NAME, null, contentValues);
+        Uri newUri2 = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
 
         contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, "IceBreaker T-Shirt");
         contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 45.99);
@@ -96,15 +100,17 @@ public class TravelCatalogMain extends AppCompatActivity {
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, "IceBreaker");
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "503.555.1384");
 
-        wDB.insert(TravelContract.TravelEntry.TABLE_NAME, null, contentValues);
+        Uri newUri3 = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
+
+        Log.e(LOG_TAG, "Content Values are: " + contentValues);
     }
 
     /**
      * Reads the rows of test data and displays the results on the screen.
      * For grading and debugging purposes only.
      */
-    private void testReadTravelDB() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+    private void displayTravelDb() {
+
         String[] projection = {
                 TravelContract.TravelEntry._ID,
                 TravelContract.TravelEntry.COLUMN_NAME,
@@ -116,16 +122,16 @@ public class TravelCatalogMain extends AppCompatActivity {
                 TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE,
         };
 
+
         // Query selects all results from current inventory of test data
-        Cursor cursor = db.query(
-                TravelContract.TravelEntry.TABLE_NAME,
+        Cursor cursor = getContentResolver().query(
+                TravelContract.TravelEntry.CONTENT_URI,
                 projection,
                 null,
                 null,
                 null,
-                null,
                 null);
-
+        Log.e(LOG_TAG, "Content URI is: " + TravelContract.TravelEntry.CONTENT_URI);
         //Locate test textViews
         TextView rowCountView = findViewById(R.id.row_count);
         TextView testQueryView = findViewById(R.id.test_query);
@@ -172,7 +178,7 @@ public class TravelCatalogMain extends AppCompatActivity {
             }
 
         } finally {
-            cursor.close();
+            if (cursor != null) {cursor.close();}
         }
     }
 
@@ -190,11 +196,15 @@ public class TravelCatalogMain extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+            case R.id.action_insert_test_set:
+                testWriteTravelDB();
+                displayTravelDb();
+                return true;
+            case R.id.action_delete_all_entries:
+                //TODO write new delete all action
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
