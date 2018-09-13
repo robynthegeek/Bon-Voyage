@@ -3,4 +3,5 @@
     <string name="action_settings">Settings</string>
     <string name="insert_test_data">Insert Test Data</string>
     <string name="delete_all_data">Delete All Data</string>
+    <string name="item">Item</string>
 </resources>
