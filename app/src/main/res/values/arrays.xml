@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_category_options">
+        <item>@string/category_unknown</item>
+        <item>@string/category_technology</item>
+        <item>@string/category_clothing</item>
+        <item>@string/category_toiletries</item>
+        <item>@string/category_accessories</item>
+        <item>@string/category_luggage</item>
+    </string-array>
+    <string-array name="array_season_options">
+        <item>@string/all_season</item>
+        <item>@string/cold_weather</item>
+        <item>@string/hot_weather</item>
+    </string-array>
+</resources>

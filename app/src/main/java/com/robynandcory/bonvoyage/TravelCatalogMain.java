@@ -1,6 +1,7 @@
 package com.robynandcory.bonvoyage;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -49,8 +50,8 @@ public class TravelCatalogMain extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "During UI phase this will add an entry", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(TravelCatalogMain.this, EditorActivity.class);
+                startActivity(intent);
             }
         });
         //Inserts single entry to test DB, for debugging and grading only.

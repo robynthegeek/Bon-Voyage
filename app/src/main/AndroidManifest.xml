@@ -19,6 +19,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".EditorActivity"
+            android:label="Add an item"
+            android:parentActivityName=".TravelCatalogMain">
+
+        </activity>
+
         <provider
             android:authorities="com.robynandcory.bonvoyage"
             android:name=".data.TravelProvider"

@@ -71,7 +71,7 @@ public class TravelContract {
          */
         public final static int COLUMN_ITEM_SEASON_ALLSEASON = 0;
         public final static int COLUMN_ITEM_SEASON_COLD = 1;
-        public final static int COLUMN_ITEM_SEASON_WARM = 2;
+        public final static int COLUMN_ITEM_SEASON_HOT = 2;
 
 
         /**
