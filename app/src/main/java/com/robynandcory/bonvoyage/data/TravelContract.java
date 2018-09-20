@@ -60,6 +60,15 @@ public class TravelContract {
         public static final int COLUMN_ITEM_CATEGORY_LUGGAGE = 5;
         //public static final int DOCUMENTS = ?;
         //public static final int OUTDOOR = ?;
+        public static final int CATEGORY_MAX = 5;
+
+        //check for valid category  and allow categories to expand if new item categories are added.
+        public static boolean isValidCategory(int category) {
+            if (category <= CATEGORY_MAX && category >= 0) {
+                return true;
+            }
+            return false;
+        }
 
         /**
          * Season for item sale.
@@ -72,6 +81,14 @@ public class TravelContract {
         public final static int COLUMN_ITEM_SEASON_ALLSEASON = 0;
         public final static int COLUMN_ITEM_SEASON_COLD = 1;
         public final static int COLUMN_ITEM_SEASON_HOT = 2;
+
+        public static boolean isValidSeason(int season) {
+            if (season == COLUMN_ITEM_SEASON_ALLSEASON || season == COLUMN_ITEM_SEASON_COLD
+                    || season == COLUMN_ITEM_SEASON_HOT) {
+                return true;
+            }
+            return false;
+        }
 
 
         /**

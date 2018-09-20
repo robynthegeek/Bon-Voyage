@@ -20,7 +20,7 @@ public class TravelDbHelper extends SQLiteOpenHelper {
         String SQL_CREATE_TRAVEL_DB = "CREATE TABLE " + TravelContract.TravelEntry.TABLE_NAME + " ("
                 + TravelContract.TravelEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + TravelContract.TravelEntry.COLUMN_NAME + " TEXT NOT NULL, "
-                + TravelContract.TravelEntry.COLUMN_PRICE + " REAL NOT NULL, "
+                + TravelContract.TravelEntry.COLUMN_PRICE + " INTEGER NOT NULL, "
                 + TravelContract.TravelEntry.COLUMN_QUANTITY + " INTEGER NOT NULL DEFAULT 0, "
                 + TravelContract.TravelEntry.COLUMN_CATEGORY + " INTEGER NOT NULL DEFAULT 0, "
                 + TravelContract.TravelEntry.COLUMN_SEASON + " INTEGER NOT NULL DEFAULT 0, "

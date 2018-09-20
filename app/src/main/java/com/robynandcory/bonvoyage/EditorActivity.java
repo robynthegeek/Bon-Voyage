@@ -1,17 +1,26 @@
 package com.robynandcory.bonvoyage;
 
+import android.content.ContentValues;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.robynandcory.bonvoyage.data.TravelContract;
 
 public class EditorActivity extends AppCompatActivity {
+
+    public static final String LOG_TAG = EditorActivity.class.getSimpleName();
+
     private EditText mNameEditText;
     private EditText mPriceEditText;
     private EditText mQuantityEditText;
@@ -36,6 +45,16 @@ public class EditorActivity extends AppCompatActivity {
         mSupplierPhoneEditText = findViewById(R.id.edit_item_supplier_phone);
 
         createSpinners();
+
+        Button saveButton = (Button) findViewById(R.id.save_item_button);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.e(LOG_TAG, "this button was clicked");
+                insertNewItem();
+
+            }
+        });
 
     }
 
@@ -97,6 +116,38 @@ public class EditorActivity extends AppCompatActivity {
                 mSeason = TravelContract.TravelEntry.COLUMN_ITEM_SEASON_ALLSEASON;
             }
         });
+    }
+
+    private void insertNewItem() {
+        String nameString = mNameEditText.getText().toString().trim();
+        String priceString = mPriceEditText.getText().toString().trim();
+        String priceStringCleaned = priceString.replaceAll("[,.]", "");
+        int priceInteger = Integer.parseInt(priceStringCleaned);
+        String quantityString = mQuantityEditText.getText().toString().trim();
+        int quantityInteger = Integer.parseInt(quantityString);
+        String supplierString = mSupplierEditText.getText().toString().trim();
+        String supplierPhoneString = mSupplierPhoneEditText.getText().toString().trim();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, nameString);
+        contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, priceInteger);
+        contentValues.put(TravelContract.TravelEntry.COLUMN_QUANTITY, quantityInteger);
+        contentValues.put(TravelContract.TravelEntry.COLUMN_CATEGORY, mCategory);
+        contentValues.put(TravelContract.TravelEntry.COLUMN_SEASON, mSeason);
+        contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, supplierString);
+        contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, supplierPhoneString);
+
+        Uri newUri = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
+        if (newUri == null) {
+            Toast.makeText(this,"Error saving your item.", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this,"Your item has been added.", Toast.LENGTH_LONG).show();
+        }
+
+        Log.e(LOG_TAG, "This is what was entered" + contentValues);
+        NavUtils.navigateUpFromSameTask(this);
+
+
     }
 
 }

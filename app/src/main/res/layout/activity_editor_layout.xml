@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -15,14 +16,15 @@
             android:text="@string/item"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/edit_item_name"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_margin="16dp"/>
 
         <EditText
             android:id="@+id/edit_item_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="textCapWords"
-            android:text="Item Name"
+            android:hint="@string/item_name"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toRightOf="@id/item"/>
@@ -31,10 +33,11 @@
             android:id="@+id/price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Price"
+            android:text="@string/price"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/edit_item_price"
             app:layout_constraintTop_toBottomOf="@id/item"
+            android:layout_margin="16dp"
             />
 
         <EditText
@@ -42,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:text="Item Price"
+            android:hint="@string/item_price"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toRightOf="@id/price"
             app:layout_constraintTop_toBottomOf="@id/edit_item_name"
@@ -52,17 +55,18 @@
             android:id="@+id/quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quantity"
+            android:text="@string/quantity"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/edit_item_quantity"
-            app:layout_constraintTop_toBottomOf="@id/price"/>
+            app:layout_constraintTop_toBottomOf="@id/price"
+            android:layout_margin="16dp" />
 
         <EditText
             android:id="@+id/edit_item_quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:text="Stock Quantity"
+            android:hint="@string/stock_quantity"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toRightOf="@id/quantity"
             app:layout_constraintTop_toBottomOf="@id/edit_item_price"
@@ -72,10 +76,11 @@
             android:id="@+id/category"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Category"
+            android:text="@string/category"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/spinner_category"
-            app:layout_constraintTop_toBottomOf="@id/quantity"/>
+            app:layout_constraintTop_toBottomOf="@id/quantity"
+            android:layout_margin="16dp"/>
 
         <Spinner
             android:id="@+id/spinner_category"
@@ -90,10 +95,11 @@
             android:id="@+id/season"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Season"
+            android:text="@string/season"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/spinner_season"
-            app:layout_constraintTop_toBottomOf="@id/category"/>
+            app:layout_constraintTop_toBottomOf="@id/category"
+            android:layout_margin="16dp"/>
 
         <Spinner
             android:id="@+id/spinner_season"
@@ -109,17 +115,18 @@
             android:id="@+id/supplier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Supplier"
+            android:text="@string/supplier"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/edit_item_supplier"
-            app:layout_constraintTop_toBottomOf="@id/season"/>
+            app:layout_constraintTop_toBottomOf="@id/season"
+            android:layout_margin="16dp"/>
 
         <EditText
             android:id="@+id/edit_item_supplier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:text="Supplier Name"
+            android:inputType="textCapWords"
+            android:hint="@string/supplier_name"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toRightOf="@id/supplier"
             app:layout_constraintTop_toBottomOf="@id/spinner_season"
@@ -129,21 +136,36 @@
             android:id="@+id/supplier_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Supplier Phone"
+            android:text="@string/supplier_phone"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/edit_item_supplier_phone"
-            app:layout_constraintTop_toBottomOf="@id/supplier"/>
+            app:layout_constraintTop_toBottomOf="@id/supplier"
+            android:layout_margin="16dp"/>
 
         <EditText
             android:id="@+id/edit_item_supplier_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="phone"
-            android:text="(503) 555-1234"
+            android:hint="@string/_503_555_1234"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toRightOf="@id/supplier_phone"
             app:layout_constraintTop_toBottomOf="@id/edit_item_supplier"
             />
+
+        <Button
+            android:id="@+id/save_item_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:text="@string/save"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_item_supplier_phone"
+            android:layout_margin="16dp"/>
 
 
     </android.support.constraint.ConstraintLayout>

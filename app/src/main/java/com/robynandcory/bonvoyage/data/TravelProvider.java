@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
 import com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
 
 public class TravelProvider extends ContentProvider {
@@ -54,7 +55,7 @@ public class TravelProvider extends ContentProvider {
                 break;
             case TRAVEL_ID:
                 selection = TravelEntry._ID + "=?";
-                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri))};
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 cursor = database.query(
                         TravelContract.TravelEntry.TABLE_NAME,
                         projection,
@@ -65,7 +66,7 @@ public class TravelProvider extends ContentProvider {
                         sortOrder);
                 break;
             default:
-                throw new IllegalArgumentException("Cannot process unkown URI: " + uri);
+                throw new IllegalArgumentException("Cannot process this URI: " + uri);
         }
         return cursor;
     }
@@ -78,7 +79,7 @@ public class TravelProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
+    public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
 
         int match = sUriMatcher.match(uri);
         switch (match) {
@@ -89,10 +90,44 @@ public class TravelProvider extends ContentProvider {
         }
     }
 
-    private Uri insertTravel (Uri uri, ContentValues contentValues) {
+    private Uri insertTravel(Uri uri, ContentValues contentValues) {
+        /**
+         * Throw error if provider receives a null value for the item name, price, quantity,
+         * category, season, supplier name, and phone number.
+         */
+        String name = contentValues.getAsString(TravelEntry.COLUMN_NAME);
+        if (name == null) {
+            throw new IllegalArgumentException("Cannot create item without name");
+        }
+        Integer price = contentValues.getAsInteger(TravelEntry.COLUMN_PRICE);
+        if (price == null || price < 0) {
+            throw new IllegalArgumentException("Price greater than 0 is required");
+        }
+        //Quantity limited to between 0 and 100 stock items.
+        Integer quantity = contentValues.getAsInteger(TravelEntry.COLUMN_QUANTITY);
+        if (quantity == null || quantity < 0 || quantity > 500) {
+            throw new IllegalArgumentException("A valid quantity required");
+        }
+        Integer category = contentValues.getAsInteger(TravelEntry.COLUMN_CATEGORY);
+        if (category == null || !TravelEntry.isValidCategory(category)) {
+            throw new IllegalArgumentException("A valid Category is required.");
+        }
+        Integer season = contentValues.getAsInteger(TravelEntry.COLUMN_SEASON);
+        if (season == null || !TravelEntry.isValidSeason(season)) {
+            throw new IllegalArgumentException("A valid Season is required.");
+        }
+        String supplierName = contentValues.getAsString(TravelEntry.COLUMN_SUPPLIER);
+        if (supplierName == null) {
+            throw new IllegalArgumentException("Cannot create item without Supplier");
+        }
+        String supplierPhone = contentValues.getAsString(TravelEntry.COLUMN_SUPPLIER_PHONE);
+        if (supplierPhone == null) {
+            throw new IllegalArgumentException("Cannot create item without Supplier Contact Phone");
+        }
+
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
         long rowId = database.insert(TravelContract.TravelEntry.TABLE_NAME, null, contentValues);
-        if  (rowId == -1) {
+        if (rowId == -1) {
             Log.e(LOG_TAG, "Insertion failed for: " + uri);
             return null;
         }
@@ -105,7 +140,64 @@ public class TravelProvider extends ContentProvider {
     }
 
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int update(@NonNull Uri uri, @NonNull ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
+        /**
+         * Check for the presence of each Key, then throw error if provider receives a null value
+         * for the item name, price, quantity, category, season, supplier name, and phone number
+         * only if they should be present.
+         */
+        if (contentValues.containsKey(TravelEntry.COLUMN_NAME)) {
+            String name = contentValues.getAsString(TravelEntry.COLUMN_NAME);
+            if (name == null) {
+                throw new IllegalArgumentException("Cannot create item without name");
+            }
+        }
+        if (contentValues.containsKey(TravelEntry.COLUMN_PRICE)) {
+            Integer price = contentValues.getAsInteger(TravelEntry.COLUMN_PRICE);
+            if (price == null || price < 0) {
+                throw new IllegalArgumentException("Price greater than 0 is required");
+            }
+        }
+        if (contentValues.containsKey(TravelEntry.COLUMN_QUANTITY)) {
+            //Quantity limited to between 0 and 100 stock items.
+            Integer quantity = contentValues.getAsInteger(TravelEntry.COLUMN_QUANTITY);
+            if (quantity == null || quantity < 0 || quantity > 500) {
+                throw new IllegalArgumentException("A valid quantity required");
+            }
+        }
+        if (contentValues.containsKey(TravelEntry.COLUMN_CATEGORY)) {
+            Integer category = contentValues.getAsInteger(TravelEntry.COLUMN_CATEGORY);
+            if (category == null || !TravelEntry.isValidCategory(category)) {
+                throw new IllegalArgumentException("A valid Category is required.");
+            }
+        }
+        if (contentValues.containsKey(TravelEntry.COLUMN_SEASON)) {
+            Integer season = contentValues.getAsInteger(TravelEntry.COLUMN_SEASON);
+            if (season == null || !TravelEntry.isValidSeason(season)) {
+                throw new IllegalArgumentException("A valid Season is required.");
+            }
+        }
+        if (contentValues.containsKey(TravelEntry.COLUMN_SUPPLIER)) {
+            String supplierName = contentValues.getAsString(TravelEntry.COLUMN_SUPPLIER);
+            if (supplierName == null) {
+                throw new IllegalArgumentException("Cannot create item without Supplier");
+            }
+        }
+        if (contentValues.containsKey(TravelEntry.COLUMN_NAME)) {
+            String supplierPhone = contentValues.getAsString(TravelEntry.COLUMN_SUPPLIER_PHONE);
+            if (supplierPhone == null) {
+                throw new IllegalArgumentException("Cannot create item without Supplier Contact Phone");
+            }
+        }
+
+        if (contentValues.size() == 0) {
+            return 0;
+        }
+
+        /**
+         * Write the santity checked values to the DB
+         */
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+        return database.update(TravelEntry.TABLE_NAME, contentValues, selection, selectionArgs);
     }
 }

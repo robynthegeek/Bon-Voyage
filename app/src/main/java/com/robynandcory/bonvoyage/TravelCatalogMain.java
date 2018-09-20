@@ -60,6 +60,7 @@ public class TravelCatalogMain extends AppCompatActivity {
         displayTravelDb();
     }
 
+
     /**
      * Inserts 3 rows test data to the Travel Database
      * For grading and debugging purposes only.
