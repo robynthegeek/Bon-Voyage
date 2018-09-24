@@ -121,31 +121,58 @@ public class EditorActivity extends AppCompatActivity {
     private void insertNewItem() {
         String nameString = mNameEditText.getText().toString().trim();
         String priceString = mPriceEditText.getText().toString().trim();
-        String priceStringCleaned = priceString.replaceAll("[,.]", "");
-        int priceInteger = Integer.parseInt(priceStringCleaned);
         String quantityString = mQuantityEditText.getText().toString().trim();
-        int quantityInteger = Integer.parseInt(quantityString);
         String supplierString = mSupplierEditText.getText().toString().trim();
         String supplierPhoneString = mSupplierPhoneEditText.getText().toString().trim();
 
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, nameString);
-        contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, priceInteger);
-        contentValues.put(TravelContract.TravelEntry.COLUMN_QUANTITY, quantityInteger);
-        contentValues.put(TravelContract.TravelEntry.COLUMN_CATEGORY, mCategory);
-        contentValues.put(TravelContract.TravelEntry.COLUMN_SEASON, mSeason);
-        contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, supplierString);
-        contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, supplierPhoneString);
 
-        Uri newUri = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
-        if (newUri == null) {
-            Toast.makeText(this,"Error saving your item.", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this,"Your item has been added.", Toast.LENGTH_LONG).show();
+        //check to see if any of the input strings are empty before saving.
+        if (nameString.isEmpty() || priceString.isEmpty() || quantityString.isEmpty() ||
+                supplierString.isEmpty() || supplierPhoneString.isEmpty()) {
+            Toast.makeText(this, "Please fill all fields before saving.",
+                    Toast.LENGTH_LONG).show();
+            return;
         }
 
-        Log.e(LOG_TAG, "This is what was entered" + contentValues);
-        NavUtils.navigateUpFromSameTask(this);
+        //if all strings contain data, attempt to save the data.
+        try {
+            String priceStringCleaned = priceString.replaceAll("[^0-9]", "");
+            int priceInteger = Integer.parseInt(priceStringCleaned);
+            int quantityInteger = Integer.parseInt(quantityString);
+            String supplierPhoneCleaned = supplierPhoneString.replaceAll("[^0-9]", "");
+
+            if (supplierPhoneCleaned.length() != 10) {
+                Toast.makeText(this, "Please enter a 10 digit US phone number.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, nameString);
+            contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, priceInteger);
+            contentValues.put(TravelContract.TravelEntry.COLUMN_QUANTITY, quantityInteger);
+            contentValues.put(TravelContract.TravelEntry.COLUMN_CATEGORY, mCategory);
+            contentValues.put(TravelContract.TravelEntry.COLUMN_SEASON, mSeason);
+            contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, supplierString);
+            contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, supplierPhoneCleaned);
+
+            Uri newUri = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
+            if (newUri == null) {
+                Toast.makeText(this, "Error saving your item.", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Your item has been added.", Toast.LENGTH_LONG).show();
+            }
+
+            Log.e(LOG_TAG, "This is what was entered" + contentValues);
+            NavUtils.navigateUpFromSameTask(this);
+
+        } catch (
+                NumberFormatException e)
+
+        {
+            Toast.makeText(this, "Please enter a valid number",
+                    Toast.LENGTH_LONG).show();
+        }
 
 
     }

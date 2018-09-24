@@ -1,6 +1,7 @@
 package com.robynandcory.bonvoyage.data;
 
 
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -23,6 +24,18 @@ public class TravelContract {
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_TRAVEL);
 
         public final static String TABLE_NAME = "travel";
+
+        /**
+         * MIME Type of {@link #CONTENT_URI} for a list of travel items
+         */
+        public static final String CONTENT_LIST_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAVEL;
+
+        /**
+         * MIME Type of {@link #CONTENT_URI} for a single travel item
+         */
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAVEL;
 
         /**
          * UUID integer for travel items, auto increments without duplication.

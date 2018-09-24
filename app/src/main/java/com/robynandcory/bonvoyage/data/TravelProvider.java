@@ -7,6 +7,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.strictmode.SqliteObjectLeakedViolation;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -74,7 +75,15 @@ public class TravelProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        return null;
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case TRAVEL:
+                return TravelEntry.CONTENT_LIST_TYPE;
+            case TRAVEL_ID:
+                return TravelEntry.CONTENT_ITEM_TYPE;
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri + " with match type: " + match);
+        }
     }
 
     @Nullable
@@ -135,12 +144,43 @@ public class TravelProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+        int rowsDeleted;
+
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case TRAVEL:
+                rowsDeleted = database.delete(TravelEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case TRAVEL_ID:
+                selection = TravelEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                rowsDeleted = database.delete(TravelEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new IllegalArgumentException("Cannot delete data: " + uri);
+        }
+        return rowsDeleted;
     }
+
 
     @Override
     public int update(@NonNull Uri uri, @NonNull ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case TRAVEL:
+                return updateTravel(uri, contentValues, selection, selectionArgs);
+            case TRAVEL_ID:
+                selection = TravelEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return updateTravel(uri, contentValues, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Cannot insert data: " + uri);
+        }
+    }
+
+    public int updateTravel(@NonNull Uri uri, @NonNull ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
         /**
          * Check for the presence of each Key, then throw error if provider receives a null value
          * for the item name, price, quantity, category, season, supplier name, and phone number
@@ -190,6 +230,7 @@ public class TravelProvider extends ContentProvider {
             }
         }
 
+        //if the user has not actually updated any values, return 0 and do not change the database.
         if (contentValues.size() == 0) {
             return 0;
         }
