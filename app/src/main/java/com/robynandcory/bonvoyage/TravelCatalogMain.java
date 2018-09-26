@@ -7,8 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -34,14 +35,17 @@ import com.robynandcory.bonvoyage.data.TravelDbHelper;
 
 public class TravelCatalogMain extends AppCompatActivity {
 
-    private TravelDbHelper mDbHelper;
     public static final String LOG_TAG = TravelCatalogMain.class.getSimpleName();
-
+    private TravelDbHelper mDbHelper;
+    TravelCursorAdapter mCursorAdapter;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_travel_catalog_main);
+        recyclerView = findViewById(R.id.recycler_view);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -54,10 +58,21 @@ public class TravelCatalogMain extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        mCursorAdapter = new TravelCursorAdapter(this, null);
+        mCursorAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+               //TODO Add empty list notification
+            }
+        });
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(mCursorAdapter);
+
         //Inserts single entry to test DB, for debugging and grading only.
-        testWriteTravelDB();
+        //testWriteTravelDB();
         //reads from DB and displays in textView on the screen.  For debugging and grading only.
-        displayTravelDb();
+        //displayTravelDb();
     }
 
 

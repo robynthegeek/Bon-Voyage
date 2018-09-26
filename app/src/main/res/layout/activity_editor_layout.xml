@@ -5,168 +5,166 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/item"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/item"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/edit_item_name"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_margin="16dp"/>
+            android:text="@string/add_new_stock_item"
+            android:padding="16dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"/>
 
-        <EditText
-            android:id="@+id/edit_item_name"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="textCapWords"
-            android:hint="@string/item_name"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/item"/>
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/price"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/edit_item_price"
-            app:layout_constraintTop_toBottomOf="@id/item"
-            android:layout_margin="16dp"
-            />
+            <TextView
+                android:id="@+id/item"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/item" />
 
-        <EditText
-            android:id="@+id/edit_item_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:hint="@string/item_price"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/price"
-            app:layout_constraintTop_toBottomOf="@id/edit_item_name"
-            />
+            <EditText
+                android:id="@+id/edit_item_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/item_name"
+                android:inputType="textCapWords" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/quantity"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/quantity"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/edit_item_quantity"
-            app:layout_constraintTop_toBottomOf="@id/price"
-            android:layout_margin="16dp" />
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/edit_item_quantity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="@string/stock_quantity"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/quantity"
-            app:layout_constraintTop_toBottomOf="@id/edit_item_price"
-            />
+            <TextView
+                android:id="@+id/price"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/price" />
 
-        <TextView
-            android:id="@+id/category"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/category"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/spinner_category"
-            app:layout_constraintTop_toBottomOf="@id/quantity"
-            android:layout_margin="16dp"/>
+            <EditText
+                android:id="@+id/edit_item_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/item_price"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
 
-        <Spinner
-            android:id="@+id/spinner_category"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:spinnerMode="dropdown"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/category"
-            app:layout_constraintTop_toBottomOf="@id/edit_item_quantity"/>
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/season"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/season"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/spinner_season"
-            app:layout_constraintTop_toBottomOf="@id/category"
-            android:layout_margin="16dp"/>
+            <TextView
+                android:id="@+id/quantity"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/quantity" />
 
-        <Spinner
-            android:id="@+id/spinner_season"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:spinnerMode="dropdown"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/season"
-            app:layout_constraintTop_toBottomOf="@id/spinner_category"
-            />
+            <EditText
+                android:id="@+id/edit_item_quantity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/stock_quantity"
+                android:inputType="number" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/supplier"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/supplier"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/edit_item_supplier"
-            app:layout_constraintTop_toBottomOf="@id/season"
-            android:layout_margin="16dp"/>
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/edit_item_supplier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textCapWords"
-            android:hint="@string/supplier_name"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/supplier"
-            app:layout_constraintTop_toBottomOf="@id/spinner_season"
-            />
+            <TextView
+                android:id="@+id/category"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/category" />
 
-        <TextView
-            android:id="@+id/supplier_phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/supplier_phone"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/edit_item_supplier_phone"
-            app:layout_constraintTop_toBottomOf="@id/supplier"
-            android:layout_margin="16dp"/>
+            <Spinner
+                android:id="@+id/spinner_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/edit_item_supplier_phone"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="phone"
-            android:hint="@string/_503_555_1234"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/supplier_phone"
-            app:layout_constraintTop_toBottomOf="@id/edit_item_supplier"
-            />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/season"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/season" />
+
+            <Spinner
+                android:id="@+id/spinner_season"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/supplier"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/supplier" />
+
+            <EditText
+                android:id="@+id/edit_item_supplier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/supplier_name"
+                android:inputType="textCapWords" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/supplier_phone"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/supplier_phone" />
+
+            <EditText
+                android:id="@+id/edit_item_supplier_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/_503_555_1234"
+                android:inputType="phone" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/save_item_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_margin="16dp"
             android:text="@string/save"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_item_supplier_phone"
-            android:layout_margin="16dp"/>
+            android:layout_gravity="center"/>
 
 
-    </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 </ScrollView>
