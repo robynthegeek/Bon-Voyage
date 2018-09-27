@@ -23,13 +23,13 @@ import com.robynandcory.bonvoyage.data.TravelDbHelper;
 
 /**
  * Project 8 for Udacity ABND
- *
+ * <p>
  * Current app contains a single SQLite table to store inventory information for a travel store.
  * UI to be completed in phase 2 of the project.
- *
+ * <p>
  * References:
  * https://github.com/udacity/ud845-Pets
- *
+ * <p>
  * Icons paid use from https://gumroad.com/d/302e27c9605ad25705945f65e006e1a4
  */
 
@@ -44,7 +44,6 @@ public class TravelCatalogMain extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_travel_catalog_main);
-        recyclerView = findViewById(R.id.recycler_view);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -58,21 +57,13 @@ public class TravelCatalogMain extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        mCursorAdapter = new TravelCursorAdapter(this, null);
-        mCursorAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-               //TODO Add empty list notification
-            }
-        });
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(mCursorAdapter);
+        testWriteTravelDB();
+
 
         //Inserts single entry to test DB, for debugging and grading only.
-        //testWriteTravelDB();
+
         //reads from DB and displays in textView on the screen.  For debugging and grading only.
-        //displayTravelDb();
+        displayTravelDb();
     }
 
 
@@ -149,54 +140,24 @@ public class TravelCatalogMain extends AppCompatActivity {
                 null,
                 null);
         Log.e(LOG_TAG, "Content URI is: " + TravelContract.TravelEntry.CONTENT_URI);
-        //Locate test textViews
-        TextView rowCountView = findViewById(R.id.row_count);
-        TextView testQueryView = findViewById(R.id.test_query);
 
+        //locate recyclerview for list items
+        recyclerView = findViewById(R.id.recycler_view);
 
-        try {
-            rowCountView.setText("There are currently " + cursor.getCount() + " items in your inventory.");
-            testQueryView.setText("Inventory Contains: \n");
-            testQueryView.append(TravelContract.TravelEntry._ID + " - " +
-                    TravelContract.TravelEntry.COLUMN_NAME + " - " +
-                    TravelContract.TravelEntry.COLUMN_PRICE + " - " +
-                    TravelContract.TravelEntry.COLUMN_QUANTITY + " - " +
-                    TravelContract.TravelEntry.COLUMN_CATEGORY + " - " +
-                    TravelContract.TravelEntry.COLUMN_SEASON + " - " +
-                    TravelContract.TravelEntry.COLUMN_SUPPLIER + " - " +
-                    TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE + "\n");
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-            int idColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry._ID);
-            int nameColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_NAME);
-            int priceColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_PRICE);
-            int quantityColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_QUANTITY);
-            int categoryColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_CATEGORY);
-            int seasonColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_SEASON);
-            int supplierColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_SUPPLIER);
-            int supplierPhoneColumnIndex = cursor.getColumnIndex(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE);
-
-            while (cursor.moveToNext()) {
-                int currentID = cursor.getInt(idColumnIndex);
-                String currentName = cursor.getString(nameColumnIndex);
-                long currentPrice = cursor.getLong(priceColumnIndex);
-                int currentQuantity = cursor.getInt(quantityColumnIndex);
-                int currentCategory = cursor.getInt(categoryColumnIndex);
-                int currentSeason = cursor.getInt(seasonColumnIndex);
-                String currentSupplier = cursor.getString(supplierColumnIndex);
-                String currentSupplierPhone = cursor.getString(supplierPhoneColumnIndex);
-                testQueryView.append(("\n" + currentID + " - " +
-                        currentName + " - " +
-                        currentPrice + " - " +
-                        currentQuantity + " - " +
-                        currentCategory + " - " +
-                        currentSeason + " - " +
-                        currentSupplier + " - " +
-                        currentSupplierPhone));
+        //sets up recyclerview with the cursorAdapter
+        mCursorAdapter = new TravelCursorAdapter(this, cursor);
+        mCursorAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                //TODO Add empty list notification
             }
+        });
+        recyclerView.setAdapter(mCursorAdapter);
 
-        } finally {
-            if (cursor != null) {cursor.close();}
-        }
+
     }
 
 //ToDo Add support for menu options in the UI phase.

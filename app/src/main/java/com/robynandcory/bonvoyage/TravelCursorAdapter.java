@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,7 @@ public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapte
 
                 int cursorItemId = cursor.getInt(cursor.getColumnIndex(TravelEntry._ID));
                 final Uri contentUri = Uri.withAppendedPath(TravelEntry.CONTENT_URI, Integer.toString(cursorItemId));
+                Log.e("TravelCursorAdapter", "bindView is being called");
             }
         };
 
