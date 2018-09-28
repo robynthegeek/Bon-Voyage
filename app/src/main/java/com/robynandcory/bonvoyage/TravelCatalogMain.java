@@ -1,6 +1,7 @@
 package com.robynandcory.bonvoyage;
 
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -9,6 +10,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,7 +40,7 @@ import com.robynandcory.bonvoyage.data.TravelDbHelper;
  * Icons paid use from https://gumroad.com/d/302e27c9605ad25705945f65e006e1a4
  */
 
-public class TravelCatalogMain extends AppCompatActivity {
+public class TravelCatalogMain extends AppCompatActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String LOG_TAG = TravelCatalogMain.class.getSimpleName();
     private TravelDbHelper mDbHelper;
@@ -46,6 +49,9 @@ public class TravelCatalogMain extends AppCompatActivity {
     //Views for the item list
     RecyclerView recyclerView;
     ConstraintLayout emptyConstraintLayout;
+
+    //Item loader ID
+    private static final int LOADER = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,11 +72,21 @@ public class TravelCatalogMain extends AppCompatActivity {
         });
 
 
-
         //Inserts single entry to test DB, for debugging and grading only.
 
         //reads from DB and displays in textView on the screen.  For debugging and grading only.
         displayTravelDb();
+        getLoaderManager().initLoader(LOADER, null, this);
+
+        //View for the empty list
+        emptyConstraintLayout = findViewById(R.id.empty_list_layout);
+
+        if (mCursorAdapter.getItemCount() == 0) {
+            emptyConstraintLayout.setVisibility(View.VISIBLE);
+        } else {
+            emptyConstraintLayout.setVisibility(View.GONE);
+        }
+
     }
 
 
@@ -126,34 +142,12 @@ public class TravelCatalogMain extends AppCompatActivity {
      */
     private void displayTravelDb() {
 
-        String[] projection = {
-                TravelContract.TravelEntry._ID,
-                TravelContract.TravelEntry.COLUMN_NAME,
-                TravelContract.TravelEntry.COLUMN_PRICE,
-                TravelContract.TravelEntry.COLUMN_QUANTITY,
-                TravelContract.TravelEntry.COLUMN_CATEGORY,
-                TravelContract.TravelEntry.COLUMN_SEASON,
-                TravelContract.TravelEntry.COLUMN_SUPPLIER,
-                TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE,
-        };
-
-
-        // Query selects all results from current inventory of test data
-        Cursor cursor = getContentResolver().query(
-                TravelContract.TravelEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null,
-                null);
-        Log.e(LOG_TAG, "Content URI is: " + TravelContract.TravelEntry.CONTENT_URI);
-
         //locate recyclerview for list items
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //sets up recyclerview with the cursorAdapter
-        mCursorAdapter = new TravelCursorAdapter(this, cursor);
+        mCursorAdapter = new TravelCursorAdapter(this, null);
         mCursorAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
@@ -163,17 +157,8 @@ public class TravelCatalogMain extends AppCompatActivity {
         });
         recyclerView.setAdapter(mCursorAdapter);
 
-        //View for the empty list
-        emptyConstraintLayout = findViewById(R.id.empty_list_layout);
-
-        if (mCursorAdapter.getItemCount() == 0) {
-            emptyConstraintLayout.setVisibility(View.VISIBLE);
-        } else {
-            emptyConstraintLayout.setVisibility(View.GONE);
-        }
 
     }
-
 
 
 //ToDo Add support for menu options in the UI phase.
@@ -224,4 +209,34 @@ public class TravelCatalogMain extends AppCompatActivity {
         (alertDialogBuilder.create()).show();
     }
 
+    @Override
+    public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = {
+                TravelContract.TravelEntry._ID,
+                TravelContract.TravelEntry.COLUMN_NAME,
+                TravelContract.TravelEntry.COLUMN_PRICE,
+                TravelContract.TravelEntry.COLUMN_QUANTITY
+//                ,
+//                TravelContract.TravelEntry.COLUMN_CATEGORY,
+//                TravelContract.TravelEntry.COLUMN_SEASON,
+//                TravelContract.TravelEntry.COLUMN_SUPPLIER,
+//                TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE
+        };
+        return new CursorLoader(this,
+                TravelContract.TravelEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor cursor) {
+        mCursorAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(android.content.Loader<Cursor> loader) {
+        mCursorAdapter.swapCursor(null);
+    }
 }

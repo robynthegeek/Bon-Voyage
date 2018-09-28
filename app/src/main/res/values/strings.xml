@@ -28,5 +28,5 @@
     <string name="_503_555_1234">(503) 555-1234</string>
     <string name="save">SAVE</string>
     <string name="add_new_stock_item">Add New Stock Item</string>
-    <string name="add_some_items_to_your_inventory_n_with_the_add_button">Add some items to your inventory   with the add button.</string>
+    <string name="add_some_items">Add some items to your inventory.</string>
 </resources>
