@@ -1,12 +1,15 @@
 package com.robynandcory.bonvoyage;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +32,7 @@ import com.robynandcory.bonvoyage.data.TravelDbHelper;
  * <p>
  * References:
  * https://github.com/udacity/ud845-Pets
+ * https://stackoverflow.com/questions/28217436/how-to-show-an-empty-view-with-a-recyclerview
  * <p>
  * Icons paid use from https://gumroad.com/d/302e27c9605ad25705945f65e006e1a4
  */
@@ -38,7 +42,10 @@ public class TravelCatalogMain extends AppCompatActivity {
     public static final String LOG_TAG = TravelCatalogMain.class.getSimpleName();
     private TravelDbHelper mDbHelper;
     TravelCursorAdapter mCursorAdapter;
+
+    //Views for the item list
     RecyclerView recyclerView;
+    ConstraintLayout emptyConstraintLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +64,7 @@ public class TravelCatalogMain extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        testWriteTravelDB();
+
 
 
         //Inserts single entry to test DB, for debugging and grading only.
@@ -76,7 +83,7 @@ public class TravelCatalogMain extends AppCompatActivity {
         SQLiteDatabase wDB = mDbHelper.getWritableDatabase();
 
         // Clear DB by deleting all entries before adding new test data
-        wDB.delete(TravelContract.TravelEntry.TABLE_NAME, null, null);
+        //wDB.delete(TravelContract.TravelEntry.TABLE_NAME, null, null);
 
         // Adds 3 rows of test data
         ContentValues contentValues = new ContentValues();
@@ -143,7 +150,6 @@ public class TravelCatalogMain extends AppCompatActivity {
 
         //locate recyclerview for list items
         recyclerView = findViewById(R.id.recycler_view);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //sets up recyclerview with the cursorAdapter
@@ -157,8 +163,18 @@ public class TravelCatalogMain extends AppCompatActivity {
         });
         recyclerView.setAdapter(mCursorAdapter);
 
+        //View for the empty list
+        emptyConstraintLayout = findViewById(R.id.empty_list_layout);
+
+        if (mCursorAdapter.getItemCount() == 0) {
+            emptyConstraintLayout.setVisibility(View.VISIBLE);
+        } else {
+            emptyConstraintLayout.setVisibility(View.GONE);
+        }
 
     }
+
+
 
 //ToDo Add support for menu options in the UI phase.
 
@@ -181,10 +197,31 @@ public class TravelCatalogMain extends AppCompatActivity {
                 displayTravelDb();
                 return true;
             case R.id.action_delete_all_entries:
-                //TODO write new delete all action
+                deleteAllEntries();
                 return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
+
+    private void deleteAllEntries() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage(R.string.delete_all_data_confirm);
+        alertDialogBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                int rowsDeleted = getContentResolver().delete(TravelContract.TravelEntry.CONTENT_URI,
+                        null, null);
+            }
+        });
+        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null) {
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+        (alertDialogBuilder.create()).show();
+    }
+
 }

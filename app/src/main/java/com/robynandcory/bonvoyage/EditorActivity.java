@@ -46,7 +46,7 @@ public class EditorActivity extends AppCompatActivity {
 
         createSpinners();
 
-        Button saveButton = (Button) findViewById(R.id.save_item_button);
+        Button saveButton = findViewById(R.id.save_item_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -143,6 +143,18 @@ public class EditorActivity extends AppCompatActivity {
 
             if (supplierPhoneCleaned.length() != 10) {
                 Toast.makeText(this, "Please enter a 10 digit US phone number.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (quantityString.length() > 3) {
+                Toast.makeText(this, "Maximum stock quantity is 999.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (priceInteger > 99999) {
+                Toast.makeText(this, "Maximum item price is $999.99.",
                         Toast.LENGTH_LONG).show();
                 return;
             }

@@ -3,6 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="insert_test_data">Insert Test Data</string>
     <string name="delete_all_data">Delete All Data</string>
+    <string name="delete_all_data_confirm">Are you sure you want to delete all data?</string>
     <string name="all_season">All Season</string>
     <string name="hot_weather">Hot Weather</string>
     <string name="cold_weather">Cold Weather</string>
@@ -27,4 +28,5 @@
     <string name="_503_555_1234">(503) 555-1234</string>
     <string name="save">SAVE</string>
     <string name="add_new_stock_item">Add New Stock Item</string>
+    <string name="add_some_items_to_your_inventory_n_with_the_add_button">Add some items to your inventory   with the add button.</string>
 </resources>

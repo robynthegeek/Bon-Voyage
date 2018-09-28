@@ -109,12 +109,12 @@ public class TravelProvider extends ContentProvider {
             throw new IllegalArgumentException("Cannot create item without name");
         }
         Integer price = contentValues.getAsInteger(TravelEntry.COLUMN_PRICE);
-        if (price == null || price < 0) {
+        if (price == null || price < 0 || price > 99999) {
             throw new IllegalArgumentException("Price greater than 0 is required");
         }
         //Quantity limited to between 0 and 100 stock items.
         Integer quantity = contentValues.getAsInteger(TravelEntry.COLUMN_QUANTITY);
-        if (quantity == null || quantity < 0 || quantity > 500) {
+        if (quantity == null || quantity < 0 || quantity > 999) {
             throw new IllegalArgumentException("A valid quantity required");
         }
         Integer category = contentValues.getAsInteger(TravelEntry.COLUMN_CATEGORY);
@@ -201,7 +201,7 @@ public class TravelProvider extends ContentProvider {
         if (contentValues.containsKey(TravelEntry.COLUMN_QUANTITY)) {
             //Quantity limited to between 0 and 100 stock items.
             Integer quantity = contentValues.getAsInteger(TravelEntry.COLUMN_QUANTITY);
-            if (quantity == null || quantity < 0 || quantity > 500) {
+            if (quantity == null || quantity < 0 || quantity > 999) {
                 throw new IllegalArgumentException("A valid quantity required");
             }
         }
