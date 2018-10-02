@@ -72,20 +72,9 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
         });
 
 
-        //Inserts single entry to test DB, for debugging and grading only.
-
-        //reads from DB and displays in textView on the screen.  For debugging and grading only.
         displayTravelDb();
         getLoaderManager().initLoader(LOADER, null, this);
 
-        //View for the empty list
-        emptyConstraintLayout = findViewById(R.id.empty_list_layout);
-
-        if (mCursorAdapter.getItemCount() == 0) {
-            emptyConstraintLayout.setVisibility(View.VISIBLE);
-        } else {
-            emptyConstraintLayout.setVisibility(View.GONE);
-        }
 
     }
 
@@ -152,16 +141,19 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
             @Override
             public void onChanged() {
                 super.onChanged();
-                //TODO Add empty list notification
+                //View for the empty list
+                emptyConstraintLayout = findViewById(R.id.empty_list_layout);
+
+                if (mCursorAdapter.getItemCount() == 0) {
+                    emptyConstraintLayout.setVisibility(View.VISIBLE);
+                } else {
+                    emptyConstraintLayout.setVisibility(View.GONE);
+                }
             }
         });
         recyclerView.setAdapter(mCursorAdapter);
-
-
     }
 
-
-//ToDo Add support for menu options in the UI phase.
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -188,6 +180,9 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Allows user to delete all entries from the settings menu.
+     */
     private void deleteAllEntries() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage(R.string.delete_all_data_confirm);

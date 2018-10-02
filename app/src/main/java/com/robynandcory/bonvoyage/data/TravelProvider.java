@@ -16,13 +16,17 @@ import com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
 
 public class TravelProvider extends ContentProvider {
     private TravelDbHelper mDbHelper;
+
+    //Log tag for error logging
     public static final String LOG_TAG = TravelProvider.class.getSimpleName();
 
+    // URI matcher codes
     private static final int TRAVEL = 1;
     private static final int TRAVEL_ID = 2;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
+    // URI paths for whole DB and single DB row.
     static {
         sUriMatcher.addURI(TravelContract.CONTENT_AUTHORITY, TravelContract.PATH_TRAVEL, TRAVEL);
         sUriMatcher.addURI(TravelContract.CONTENT_AUTHORITY, TravelContract.PATH_TRAVEL + "/#", TRAVEL_ID);
@@ -42,6 +46,7 @@ public class TravelProvider extends ContentProvider {
         SQLiteDatabase database = mDbHelper.getReadableDatabase();
         Cursor cursor;
 
+        // Matches the URI to either the full DB URI or a URI for a single row
         int match = sUriMatcher.match(uri);
         switch (match) {
             case TRAVEL:
@@ -69,12 +74,16 @@ public class TravelProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Cannot process this URI: " + uri);
         }
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
+
+        // Matches the URI to either the full DB URI or a URI for a single row
+
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case TRAVEL:
@@ -89,7 +98,7 @@ public class TravelProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
-
+        // Matches the URI to either the full DB URI or a URI for a single row
         int match = sUriMatcher.match(uri);
         switch (match) {
             case TRAVEL:
@@ -133,13 +142,15 @@ public class TravelProvider extends ContentProvider {
         if (supplierPhone == null) {
             throw new IllegalArgumentException("Cannot create item without Supplier Contact Phone");
         }
-
+        // Write the sanity checked data to the DB
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
         long rowId = database.insert(TravelContract.TravelEntry.TABLE_NAME, null, contentValues);
         if (rowId == -1) {
             Log.e(LOG_TAG, "Insertion failed for: " + uri);
             return null;
         }
+        // Notify listener of change and return new URI and row ID.
+        getContext().getContentResolver().notifyChange(uri, null);
         return ContentUris.withAppendedId(uri, rowId);
     }
 
@@ -147,7 +158,7 @@ public class TravelProvider extends ContentProvider {
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
         int rowsDeleted;
-
+        // Matches the URI to either the full DB URI or a URI for a single row
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case TRAVEL:
@@ -161,12 +172,20 @@ public class TravelProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Cannot delete data: " + uri);
         }
+        //Notify listener if rows have been deleted
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
         return rowsDeleted;
     }
 
 
     @Override
     public int update(@NonNull Uri uri, @NonNull ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
+        /**
+         * Matches the URI to either the full DB URI or a URI for a single row,
+         // uses updateTravel to update row or entire DB
+         */
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case TRAVEL:
@@ -179,13 +198,14 @@ public class TravelProvider extends ContentProvider {
                 throw new IllegalArgumentException("Cannot insert data: " + uri);
         }
     }
-
+    /**
+     * Updates the given row or entire DB for the input URI.
+     * Check for the presence of each Key, then throw error if provider receives a null value
+     * for the item name, price, quantity, category, season, supplier name, and phone number
+     * only if they should be present.
+     */
     public int updateTravel(@NonNull Uri uri, @NonNull ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
-        /**
-         * Check for the presence of each Key, then throw error if provider receives a null value
-         * for the item name, price, quantity, category, season, supplier name, and phone number
-         * only if they should be present.
-         */
+
         if (contentValues.containsKey(TravelEntry.COLUMN_NAME)) {
             String name = contentValues.getAsString(TravelEntry.COLUMN_NAME);
             if (name == null) {
@@ -234,11 +254,15 @@ public class TravelProvider extends ContentProvider {
         if (contentValues.size() == 0) {
             return 0;
         }
-
         /**
-         * Write the santity checked values to the DB
+         * Write the santity checked values to the DB only if new data has been entered.
          */
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
-        return database.update(TravelEntry.TABLE_NAME, contentValues, selection, selectionArgs);
+        int rowsUpdated =  database.update(TravelEntry.TABLE_NAME, contentValues, selection, selectionArgs);
+
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
     }
 }
