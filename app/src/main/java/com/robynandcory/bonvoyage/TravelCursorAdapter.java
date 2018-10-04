@@ -2,6 +2,7 @@ package com.robynandcory.bonvoyage;
 
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -18,10 +19,12 @@ import static com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
 
 /**
  * Credit for reference for cursor adapter with recyclerview: https://github.com/dizzy-miss-lizzy/BookInventory
+ * https://stackoverflow.com/questions/24471109/recyclerview-onclick
  */
 public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapter.TravelHolder> {
     private Context context;
     private CursorAdapter cursorAdapter;
+    private Uri currentItemUri = null;
 
     public TravelCursorAdapter(Context context, Cursor cursor) {
         this.context = context;
@@ -69,7 +72,9 @@ public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapte
 
         @Override
         public void onClick(View view) {
-
+            Intent intent = new Intent(context, EditorActivity.class);
+            intent.setData(currentItemUri);
+            context.startActivity(intent);
         }
     }
 
@@ -89,7 +94,7 @@ public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapte
         cursorAdapter.getCursor().moveToPosition(position);
         cursorAdapter.bindView(travelHolder.itemView, context, cursorAdapter.getCursor());
         final long currentUri = cursorAdapter.getItemId(position);
-        final Uri currentItemUri = ContentUris.withAppendedId(TravelEntry.CONTENT_URI, currentUri);
+        currentItemUri = ContentUris.withAppendedId(TravelEntry.CONTENT_URI, currentUri);
     }
 
     @Override

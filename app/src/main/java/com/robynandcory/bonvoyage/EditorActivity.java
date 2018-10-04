@@ -1,8 +1,15 @@
 package com.robynandcory.bonvoyage;
 
+import android.app.Activity;
 import android.content.ContentValues;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -13,13 +20,18 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.robynandcory.bonvoyage.data.TravelContract;
+import com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
 
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
+
 
     public static final String LOG_TAG = EditorActivity.class.getSimpleName();
+
+    private static final int TRAVEL_ITEM_LOADER = 1;
 
     private EditText mNameEditText;
     private EditText mPriceEditText;
@@ -30,9 +42,11 @@ public class EditorActivity extends AppCompatActivity {
     private int mSeason = TravelContract.TravelEntry.COLUMN_ITEM_SEASON_ALLSEASON;
     private EditText mSupplierEditText;
     private EditText mSupplierPhoneEditText;
+    private Uri mCurrentUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor_layout);
 
@@ -55,6 +69,23 @@ public class EditorActivity extends AppCompatActivity {
 
             }
         });
+
+        Intent editIntent = getIntent();
+        mCurrentUri = editIntent.getData();
+        if (mCurrentUri != null) {
+            createEditor(mCurrentUri);
+        } else {
+            this.setTitle("Add an Item");
+        }
+
+    }
+
+    private void createEditor(Uri uri) {
+        this.setTitle("Edit Item");
+        TextView editorTitle = findViewById(R.id.editor_text_title);
+        editorTitle.setText("Edit Stock Item");
+        getLoaderManager().initLoader(TRAVEL_ITEM_LOADER, null, this);
+
 
     }
 
@@ -189,4 +220,92 @@ public class EditorActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = {
+                TravelContract.TravelEntry._ID,
+                TravelContract.TravelEntry.COLUMN_NAME,
+                TravelContract.TravelEntry.COLUMN_PRICE,
+                TravelContract.TravelEntry.COLUMN_QUANTITY,
+                TravelContract.TravelEntry.COLUMN_CATEGORY,
+                TravelContract.TravelEntry.COLUMN_SEASON,
+                TravelContract.TravelEntry.COLUMN_SUPPLIER,
+                TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE
+        };
+        return new CursorLoader(this,
+                mCurrentUri,  //Uri for the item user is editing
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+
+        if (cursor == null || cursor.getCount() == 0) {
+            return;
+        }
+        if (cursor.moveToFirst()) {
+            int nameColumnIndex = cursor.getColumnIndex(TravelEntry.COLUMN_NAME);
+            int priceColumnIndex = cursor.getColumnIndex(TravelEntry.COLUMN_PRICE);
+            int quantityColumnIndex = cursor.getColumnIndex(TravelEntry.COLUMN_QUANTITY);
+            int categoryColumnIndex = cursor.getColumnIndex(TravelEntry.COLUMN_CATEGORY);
+            int seasonColumnIndex = cursor.getColumnIndex(TravelEntry.COLUMN_SEASON);
+            int supplierColumnIndex = cursor.getColumnIndex(TravelEntry.COLUMN_SUPPLIER);
+            int supplierPhoneColumnIndex = cursor.getColumnIndex(TravelEntry.COLUMN_SUPPLIER_PHONE);
+
+
+            String itemName = cursor.getString(nameColumnIndex);
+            int itemPrice = cursor.getInt(priceColumnIndex);
+            int itemQuantity = cursor.getInt(quantityColumnIndex);
+            int itemCategory = cursor.getInt(categoryColumnIndex);
+            int itemSeason = cursor.getInt(seasonColumnIndex);
+            String itemSupplier = cursor.getString(supplierColumnIndex);
+            String itemSupplierPhone = cursor.getString(supplierPhoneColumnIndex);
+
+            mNameEditText.setText(itemName);
+            mPriceEditText.setText(Integer.toString(itemPrice));
+            mQuantityEditText.setText(Integer.toString(itemQuantity));
+            mSupplierEditText.setText(itemSupplier);
+            mSupplierPhoneEditText.setText(itemSupplierPhone);
+
+            switch (itemCategory) {
+                case TravelEntry.COLUMN_ITEM_CATEGORY_TECHNOLOGY:
+                    mCategorySpinner.setSelection(1);
+                case TravelEntry.COLUMN_ITEM_CATEGORY_CLOTHING:
+                    mCategorySpinner.setSelection(2);
+                case TravelEntry.COLUMN_ITEM_CATEGORY_TOILETRIES:
+                    mCategorySpinner.setSelection(3);
+                case TravelEntry.COLUMN_ITEM_CATEGORY_ACCESSORIES:
+                    mCategorySpinner.setSelection(4);
+                case TravelEntry.COLUMN_ITEM_CATEGORY_LUGGAGE:
+                    mCategorySpinner.setSelection(5);
+                default:
+                    mCategorySpinner.setSelection(0);
+                    break;
+            }
+            switch (itemSeason) {
+                case TravelEntry.COLUMN_ITEM_SEASON_COLD:
+                    mSeasonSpinner.setSelection(1);
+                case TravelEntry.COLUMN_ITEM_SEASON_HOT:
+                    mSeasonSpinner.setSelection(2);
+                default:
+                    mSeasonSpinner.setSelection(0);
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mNameEditText.setText("");
+        mPriceEditText.setText("");
+        mQuantityEditText.setText("");
+        mSupplierEditText.setText("");
+        mSupplierPhoneEditText.setText("");
+        mCategorySpinner.setSelection(0); //Unknown Category
+        mSeasonSpinner.setSelection(0);  //Allseason
+
+    }
 }

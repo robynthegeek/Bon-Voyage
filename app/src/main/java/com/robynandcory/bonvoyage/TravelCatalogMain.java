@@ -73,7 +73,6 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
 
 
         displayTravelDb();
-        getLoaderManager().initLoader(LOADER, null, this);
 
 
     }
@@ -152,6 +151,8 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
             }
         });
         recyclerView.setAdapter(mCursorAdapter);
+        getLoaderManager().initLoader(LOADER, null, this);
+
     }
 
 
