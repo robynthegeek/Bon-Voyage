@@ -1,6 +1,6 @@
 package com.robynandcory.bonvoyage;
 
-import android.app.Activity;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -65,7 +63,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
             @Override
             public void onClick(View view) {
                 Log.e(LOG_TAG, "this button was clicked");
-                insertNewItem();
+                saveItemData();
 
             }
         });
@@ -149,7 +147,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
         });
     }
 
-    private void insertNewItem() {
+    private void saveItemData() {
         String nameString = mNameEditText.getText().toString().trim();
         String priceString = mPriceEditText.getText().toString().trim();
         String quantityString = mQuantityEditText.getText().toString().trim();
@@ -199,13 +197,24 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
             contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, supplierString);
             contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, supplierPhoneCleaned);
 
-            Uri newUri = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
-            if (newUri == null) {
-                Toast.makeText(this, "Error saving your item.", Toast.LENGTH_LONG).show();
+            if (mCurrentUri != null) {
+                int rowsUpdated = getContentResolver().update(mCurrentUri,
+                        contentValues,
+                        null,
+                        null);
+                if (rowsUpdated == 0) {
+                    Toast.makeText(this, "Error saving your item.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "Your item has been added.", Toast.LENGTH_LONG).show();
+                }
             } else {
-                Toast.makeText(this, "Your item has been added.", Toast.LENGTH_LONG).show();
+                Uri newUri = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
+                if (newUri == null) {
+                    Toast.makeText(this, "Error saving your item.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "Your item has been added.", Toast.LENGTH_LONG).show();
+                }
             }
-
             Log.e(LOG_TAG, "This is what was entered" + contentValues);
             NavUtils.navigateUpFromSameTask(this);
 
