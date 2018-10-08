@@ -18,9 +18,7 @@
             android:id="@+id/iconImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_margin="16dp"
             android:src="@drawable/ic_flight_black_32dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +31,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:textSize="24sp"
+            android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@+id/list_item_quantity"
             app:layout_constraintStart_toEndOf="@+id/iconImageView"
             app:layout_constraintTop_toTopOf="parent"
@@ -46,9 +44,9 @@
             android:layout_marginBottom="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="@string/quantity"
+            android:text="@string/card_quantity"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/list_item_price"
             app:layout_constraintStart_toEndOf="@+id/iconImageView"
             app:layout_constraintTop_toBottomOf="@+id/list_item_name" />
 
@@ -60,9 +58,32 @@
             android:layout_marginStart="8dp"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/list_item_price"
             app:layout_constraintStart_toEndOf="@+id/list_item_quantity_descriptor"
             tools:text="26" />
+
+        <TextView
+            android:id="@+id/list_item_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:text="Price:"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iconImageView" />
+
+        <TextView
+            android:id="@+id/list_item_price_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/list_item_price"
+            tools:text="$97.99" />
 
         <Button
             android:id="@+id/button"

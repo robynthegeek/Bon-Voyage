@@ -9,7 +9,7 @@ import com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
 public class TravelDbHelper extends SQLiteOpenHelper {
 
     public static final String LOG_TAG = TravelDbHelper.class.getSimpleName();
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "BonVoyage.db";
 
     public TravelDbHelper(Context context) {
@@ -25,13 +25,16 @@ public class TravelDbHelper extends SQLiteOpenHelper {
                 + TravelContract.TravelEntry.COLUMN_CATEGORY + " INTEGER NOT NULL DEFAULT 0, "
                 + TravelContract.TravelEntry.COLUMN_SEASON + " INTEGER NOT NULL DEFAULT 0, "
                 + TravelContract.TravelEntry.COLUMN_SUPPLIER + " TEXT NOT NULL, "
-                + TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE + " REAL NOT NULL);";
+                + TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE + " TEXT NOT NULL);";
         db.execSQL(SQL_CREATE_TRAVEL_DB);
         Log.e(LOG_TAG, "DB Contains: " + SQL_CREATE_TRAVEL_DB);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (newVersion > oldVersion) {
+
+        }
         final String SQL_DELETE_ENTRIES =
                 "DROP TABLE IF EXISTS " + TravelContract.TravelEntry.TABLE_NAME;
         db.execSQL(SQL_DELETE_ENTRIES);

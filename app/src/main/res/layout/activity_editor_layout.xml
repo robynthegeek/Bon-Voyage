@@ -27,7 +27,7 @@
 
             <TextView
                 android:id="@+id/item"
-                android:layout_width="128dp"
+                android:layout_width="98dp"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="@string/item" />
@@ -47,7 +47,7 @@
 
             <TextView
                 android:id="@+id/price"
-                android:layout_width="128dp"
+                android:layout_width="98dp"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="@string/price" />
@@ -67,7 +67,7 @@
 
             <TextView
                 android:id="@+id/quantity"
-                android:layout_width="128dp"
+                android:layout_width="98dp"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="@string/quantity" />
@@ -87,7 +87,7 @@
 
             <TextView
                 android:id="@+id/category"
-                android:layout_width="128dp"
+                android:layout_width="98dp"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="@string/category" />
@@ -106,7 +106,7 @@
 
             <TextView
                 android:id="@+id/season"
-                android:layout_width="128dp"
+                android:layout_width="98dp"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="@string/season" />
@@ -125,7 +125,7 @@
 
             <TextView
                 android:id="@+id/supplier"
-                android:layout_width="128dp"
+                android:layout_width="98dp"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="@string/supplier" />
@@ -145,7 +145,7 @@
 
             <TextView
                 android:id="@+id/supplier_phone"
-                android:layout_width="128dp"
+                android:layout_width="98dp"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="@string/supplier_phone" />
@@ -154,8 +154,15 @@
                 android:id="@+id/edit_item_supplier_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
                 android:hint="@string/_503_555_1234"
                 android:inputType="phone" />
+            <Button
+                android:id="@+id/reorder_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:text="reorder"/>
         </LinearLayout>
 
         <Button

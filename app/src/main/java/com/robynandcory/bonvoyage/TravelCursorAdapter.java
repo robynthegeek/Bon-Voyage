@@ -15,6 +15,8 @@ import android.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+
 import static com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
 
 /**
@@ -41,22 +43,29 @@ public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapte
             public void bindView(View view, Context context, Cursor cursor) {
                 TextView nameTextView = view.findViewById(R.id.list_item_name);
                 TextView quantityTextView = view.findViewById(R.id.list_item_quantity);
+                TextView priceTextView = view.findViewById(R.id.list_item_price_amount);
 
                 int nameColumnIndex = cursor.getColumnIndex(TravelEntry.COLUMN_NAME);
                 int quantityColumnIndex = cursor.getColumnIndex(TravelEntry.COLUMN_QUANTITY);
+                int priceColumnIndex = cursor.getColumnIndex(TravelEntry.COLUMN_PRICE);
 
                 String itemName = cursor.getString(nameColumnIndex);
                 String itemQuantity = cursor.getString(quantityColumnIndex);
+                int itemPrice = cursor.getInt(priceColumnIndex);
 
                 nameTextView.setText(itemName);
                 quantityTextView.setText(itemQuantity);
+                priceTextView.setText(formatPrice(itemPrice));
+                Log.e("TravelCursorAdapter", "This is the price: " + formatPrice(itemPrice));
 
                 int cursorItemId = cursor.getInt(cursor.getColumnIndex(TravelEntry._ID));
                 final Uri contentUri = Uri.withAppendedPath(TravelEntry.CONTENT_URI, Integer.toString(cursorItemId));
-                Log.e("TravelCursorAdapter", "bindView is being called");
             }
         };
 
+    }
+    private String formatPrice (int intPrice) {
+        return Integer.toString(intPrice);
     }
 
     public void swapCursor(Cursor newCursor) {

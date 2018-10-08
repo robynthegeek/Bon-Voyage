@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,12 +18,21 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.robynandcory.bonvoyage.data.TravelContract;
 import com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
+
+import java.text.DecimalFormat;
+import java.util.List;
+
+/**
+ * Credit for reference for phone number https://stackoverflow.com/questions/8196771/format-a-string-using-regex-in-java
+ * https://stackoverflow.com/questions/30138159/check-sms-and-dial-support-before-intent
+ */
 
 public class EditorActivity extends AppCompatActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -41,6 +51,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
     private EditText mSupplierEditText;
     private EditText mSupplierPhoneEditText;
     private Uri mCurrentUri;
+    private String itemSupplierPhone = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +73,27 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.e(LOG_TAG, "this button was clicked");
                 saveItemData();
+            }
+        });
 
+        Button reorderButton = findViewById(R.id.reorder_button);
+        reorderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent dialerIntent = new Intent(Intent.ACTION_DIAL);
+                if (itemSupplierPhone != null) {
+                    dialerIntent.setData(Uri.parse("tel:" +itemSupplierPhone));
+                    PackageManager packageManager = view.getContext().getPackageManager();
+                    List activities = packageManager.queryIntentActivities(dialerIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                    boolean dialerInstalled = activities.size() > 0;
+                    if (dialerInstalled) {
+                        startActivity(dialerIntent);
+                    } else {
+                        Toast.makeText(EditorActivity.this, "Please install a phone application", Toast.LENGTH_LONG).show();
+                    }
+
+                }
             }
         });
 
@@ -149,7 +178,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
 
     private void saveItemData() {
         String nameString = mNameEditText.getText().toString().trim();
-        String priceString = mPriceEditText.getText().toString().trim();
+        String priceString = mPriceEditText.getText().toString().replaceAll("[^0-9]", "");
         String quantityString = mQuantityEditText.getText().toString().trim();
         String supplierString = mSupplierEditText.getText().toString().trim();
         String supplierPhoneString = mSupplierPhoneEditText.getText().toString().trim();
@@ -206,6 +235,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
                     Toast.makeText(this, "Error saving your item.", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(this, "Your item has been added.", Toast.LENGTH_LONG).show();
+                    finish();
                 }
             } else {
                 Uri newUri = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
@@ -213,10 +243,11 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
                     Toast.makeText(this, "Error saving your item.", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(this, "Your item has been added.", Toast.LENGTH_LONG).show();
+                    finish();
                 }
             }
             Log.e(LOG_TAG, "This is what was entered" + contentValues);
-            NavUtils.navigateUpFromSameTask(this);
+            // NavUtils.navigateUpFromSameTask(this);
 
         } catch (
                 NumberFormatException e)
@@ -266,18 +297,18 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
 
 
             String itemName = cursor.getString(nameColumnIndex);
-            int itemPrice = cursor.getInt(priceColumnIndex);
+            String itemPrice = cursor.getString(priceColumnIndex);
             int itemQuantity = cursor.getInt(quantityColumnIndex);
             int itemCategory = cursor.getInt(categoryColumnIndex);
             int itemSeason = cursor.getInt(seasonColumnIndex);
             String itemSupplier = cursor.getString(supplierColumnIndex);
-            String itemSupplierPhone = cursor.getString(supplierPhoneColumnIndex);
+            itemSupplierPhone = cursor.getString(supplierPhoneColumnIndex);
 
             mNameEditText.setText(itemName);
-            mPriceEditText.setText(Integer.toString(itemPrice));
+            mPriceEditText.setText(formatPrice(itemPrice));
             mQuantityEditText.setText(Integer.toString(itemQuantity));
             mSupplierEditText.setText(itemSupplier);
-            mSupplierPhoneEditText.setText(itemSupplierPhone);
+            mSupplierPhoneEditText.setText(formatPhoneNumber(itemSupplierPhone));
 
             switch (itemCategory) {
                 case TravelEntry.COLUMN_ITEM_CATEGORY_TECHNOLOGY:
@@ -304,6 +335,19 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
                     break;
             }
         }
+    }
+
+    private String formatPhoneNumber (String itemSupplierPhone){
+        StringBuilder stringBuilder = new StringBuilder(itemSupplierPhone)
+                .insert(0,"(")
+                .insert(4,")")
+                .insert(8,"-");
+        String formattedPhoneNumber = stringBuilder.toString();
+        return formattedPhoneNumber;
+    }
+
+    private String formatPrice (String intPrice) {
+        return intPrice.replaceFirst("(\\d{3})(\\d{3})(\\d+)", "($1) $2-$3");
     }
 
     @Override

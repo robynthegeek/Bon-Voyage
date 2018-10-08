@@ -121,6 +121,7 @@ public class TravelProvider extends ContentProvider {
         if (price == null || price < 0 || price > 99999) {
             throw new IllegalArgumentException("Price greater than 0 is required");
         }
+        Log.e(LOG_TAG, "Price as integer going into DB is: " + price);
         //Quantity limited to between 0 and 100 stock items.
         Integer quantity = contentValues.getAsInteger(TravelEntry.COLUMN_QUANTITY);
         if (quantity == null || quantity < 0 || quantity > 999) {

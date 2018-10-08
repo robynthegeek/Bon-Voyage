@@ -92,32 +92,32 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
         // Adds 3 rows of test data
         ContentValues contentValues = new ContentValues();
         contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, "Travel Bag");
-        contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 125.99);
+        contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 12599);
         contentValues.put(TravelContract.TravelEntry.COLUMN_QUANTITY, 5);
         contentValues.put(TravelContract.TravelEntry.COLUMN_CATEGORY, TravelContract.TravelEntry.COLUMN_ITEM_CATEGORY_LUGGAGE);
         contentValues.put(TravelContract.TravelEntry.COLUMN_SEASON, TravelContract.TravelEntry.COLUMN_ITEM_SEASON_ALLSEASON);
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, "Osprey");
-        contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "503.555.1234");
+        contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "5035551234");
 
         Uri newUri = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
 
         contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, "Travel Shampoo");
-        contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 2.99);
+        contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 299);
         contentValues.put(TravelContract.TravelEntry.COLUMN_QUANTITY, 8);
         contentValues.put(TravelContract.TravelEntry.COLUMN_CATEGORY, TravelContract.TravelEntry.COLUMN_ITEM_CATEGORY_TOILETRIES);
         contentValues.put(TravelContract.TravelEntry.COLUMN_SEASON, TravelContract.TravelEntry.COLUMN_ITEM_SEASON_ALLSEASON);
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, "Suave");
-        contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "503.555.1384");
+        contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "5035551384");
 
         Uri newUri2 = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
 
         contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, "IceBreaker T-Shirt");
-        contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 45.99);
+        contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, 4599);
         contentValues.put(TravelContract.TravelEntry.COLUMN_QUANTITY, 9);
         contentValues.put(TravelContract.TravelEntry.COLUMN_CATEGORY, TravelContract.TravelEntry.COLUMN_ITEM_CATEGORY_CLOTHING);
         contentValues.put(TravelContract.TravelEntry.COLUMN_SEASON, TravelContract.TravelEntry.COLUMN_ITEM_SEASON_COLD);
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER, "IceBreaker");
-        contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "503.555.1384");
+        contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "5035551384");
 
         Uri newUri3 = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
 
