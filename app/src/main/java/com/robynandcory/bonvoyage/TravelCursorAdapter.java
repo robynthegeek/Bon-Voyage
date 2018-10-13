@@ -4,7 +4,6 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -18,8 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DecimalFormat;
-import java.util.List;
+import java.util.Locale;
 
 import static com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
 
@@ -30,7 +28,6 @@ import static com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
 public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapter.TravelHolder> {
     private Context context;
     private CursorAdapter cursorAdapter;
-    private Uri currentItemUri = null;
 
     public TravelCursorAdapter(Context context, Cursor cursor) {
         this.context = context;
@@ -60,10 +57,10 @@ public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapte
                 nameTextView.setText(itemName);
                 quantityTextView.setText(itemQuantity);
                 priceTextView.setText(formatPrice(itemPrice));
-                Log.e("TravelCursorAdapter", "This is the price: " + formatPrice(itemPrice));
-
                 int cursorItemId = cursor.getInt(cursor.getColumnIndex(TravelEntry._ID));
+                //contentUri of single item
                 final Uri contentUri = Uri.withAppendedPath(TravelEntry.CONTENT_URI, Integer.toString(cursorItemId));
+                Log.e("BindViewMethod: ", "This is the content URI: " + contentUri);
 
                 Button saleButton = view.findViewById(R.id.sale_button);
                 saleButton.setOnClickListener(new View.OnClickListener() {
@@ -76,19 +73,24 @@ public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapte
                             contentValues.put(TravelEntry.COLUMN_QUANTITY, quantityInt);
                             context.getContentResolver().update(contentUri, contentValues, null, null);
                         } else {
-                            Toast.makeText(context, "Cannot set negative stock amount", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, R.string.cannot_set_negative_amount, Toast.LENGTH_SHORT).show();
                         }
-
                     }
                 });
-
             }
         };
-
     }
 
+    /**
+     * Formats the price from cents to dollars and cents.
+     *
+     * @param intPrice cleaned int from database
+     * @return Price in US dollar format, e.g. $8.99
+     */
     private String formatPrice(int intPrice) {
-        return Integer.toString(intPrice);
+        int dollars = intPrice / 100;
+        int cents = intPrice % 100;
+        return String.format(Locale.US, "$%d.%02d", dollars, cents);
     }
 
     public void swapCursor(Cursor newCursor) {
@@ -96,17 +98,9 @@ public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapte
         notifyDataSetChanged();
     }
 
-    class TravelHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class TravelHolder extends RecyclerView.ViewHolder {
         public TravelHolder(View itemCardView) {
             super(itemCardView);
-            itemCardView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            Intent intent = new Intent(context, EditorActivity.class);
-            intent.setData(currentItemUri);
-            context.startActivity(intent);
         }
     }
 
@@ -126,7 +120,22 @@ public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapte
         cursorAdapter.getCursor().moveToPosition(position);
         cursorAdapter.bindView(travelHolder.itemView, context, cursorAdapter.getCursor());
         final long currentUri = cursorAdapter.getItemId(position);
-        currentItemUri = ContentUris.withAppendedId(TravelEntry.CONTENT_URI, currentUri);
+        final Uri intentUri = ContentUris.withAppendedId(TravelEntry.CONTENT_URI, currentUri);
+
+        /**
+         * Set onClickListener on the cardView, when clicked open the detail view for given item
+         * and pass the Uri in as Intent data.
+         *
+         * @param view
+         */
+        travelHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                    Intent intent = new Intent(context, EditorActivity.class);
+                    intent.setData(intentUri);
+                    context.startActivity(intent);
+            }
+        });
     }
 
     @Override

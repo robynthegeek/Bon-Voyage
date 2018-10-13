@@ -30,4 +30,26 @@
     <string name="save">SAVE</string>
     <string name="add_new_stock_item">Add New Stock Item</string>
     <string name="add_some_items">Add some items to your inventory.</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_item">Add an Item</string>
+    <string name="edit_item">Edit Item</string>
+    <string name="edit_stock_item">Edit Stock Item</string>
+    <string name="install_phone_application">Please install a phone application</string>
+    <string name="error_saving">Error saving your item.</string>
+    <string name="cannot_set_negative_amount">Cannot set negative stock amount</string>
+    <string name="cannot_set_amount_over_999">Cannot set stock amount over 999</string>
+    <string name="enter_us_phone">Please enter a 10 digit US phone number.</string>
+    <string name="maximum_stock_quantity">Maximum stock quantity is 999.</string>
+    <string name="maximum_price">Maximum item price is $999.99.</string>
+    <string name="item_saved">Your item has been saved.</string>
+    <string name="enter_valid_number">Please enter a valid number</string>
+    <string name="fill_before_saving">Please fill all fields before saving.</string>
+    <string name="minus">-</string>
+    <string name="plus">+</string>
+    <string name="reorder">reorder</string>
+    <string name="delete_stock_item">Delete stock item</string>
+    <string name="confirm_deletion">Do you want to permanently delete this item?</string>
+    <string name="deletion_confirmed">Deletion was successful</string>
+    <string name="deletion_failed">Error: Unable to complete deletion</string>
 </resources>

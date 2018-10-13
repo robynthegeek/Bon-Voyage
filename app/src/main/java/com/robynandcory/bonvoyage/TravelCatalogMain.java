@@ -10,18 +10,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.robynandcory.bonvoyage.data.TravelContract;
 import com.robynandcory.bonvoyage.data.TravelDbHelper;
@@ -29,20 +26,17 @@ import com.robynandcory.bonvoyage.data.TravelDbHelper;
 
 /**
  * Project 8 for Udacity ABND
- * <p>
+ *
  * Current app contains a single SQLite table to store inventory information for a travel store.
- * UI to be completed in phase 2 of the project.
- * <p>
+ *
  * References:
  * https://github.com/udacity/ud845-Pets
  * https://stackoverflow.com/questions/28217436/how-to-show-an-empty-view-with-a-recyclerview
- * <p>
  * Icons paid use from https://gumroad.com/d/302e27c9605ad25705945f65e006e1a4
  */
 
 public class TravelCatalogMain extends AppCompatActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
-
-    public static final String LOG_TAG = TravelCatalogMain.class.getSimpleName();
+    //Database helper and Cursor Adapter
     private TravelDbHelper mDbHelper;
     TravelCursorAdapter mCursorAdapter;
 
@@ -56,12 +50,13 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_travel_catalog_main);
 
+        //Set up main layout and toolbar
+        setContentView(R.layout.activity_travel_catalog_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Add button per material guidelines for new inventory items.
+        // Add button for adding new items to DB
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,24 +65,16 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
                 startActivity(intent);
             }
         });
-
-
         displayTravelDb();
-
-
     }
 
 
     /**
      * Inserts 3 rows test data to the Travel Database
-     * For grading and debugging purposes only.
      */
     private void testWriteTravelDB() {
         mDbHelper = new TravelDbHelper(this);
-        SQLiteDatabase wDB = mDbHelper.getWritableDatabase();
-
-        // Clear DB by deleting all entries before adding new test data
-        //wDB.delete(TravelContract.TravelEntry.TABLE_NAME, null, null);
+        SQLiteDatabase wDb = mDbHelper.getWritableDatabase();
 
         // Adds 3 rows of test data
         ContentValues contentValues = new ContentValues();
@@ -120,8 +107,6 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
         contentValues.put(TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE, "5035551384");
 
         Uri newUri3 = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
-
-        Log.e(LOG_TAG, "Content Values are: " + contentValues);
     }
 
     /**
@@ -130,17 +115,17 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
      */
     private void displayTravelDb() {
 
-        //locate recyclerview for list items
+        //locate recyclerView for list items
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        //sets up recyclerview with the cursorAdapter
+        //sets up recyclerView with the cursorAdapter
         mCursorAdapter = new TravelCursorAdapter(this, null);
         mCursorAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
                 super.onChanged();
-                //View for the empty list
+                //View for the empty item list
                 emptyConstraintLayout = findViewById(R.id.empty_list_layout);
 
                 if (mCursorAdapter.getItemCount() == 0) {
@@ -165,11 +150,9 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks, allows 2 options: insert a test group of items,
+        // and delete all of the Database entries.
         switch (item.getItemId()) {
-
             case R.id.action_insert_test_set:
                 testWriteTravelDB();
                 displayTravelDb();
@@ -187,14 +170,20 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
     private void deleteAllEntries() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage(R.string.delete_all_data_confirm);
-        alertDialogBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 int rowsDeleted = getContentResolver().delete(TravelContract.TravelEntry.CONTENT_URI,
                         null, null);
+                if (rowsDeleted > 0) {
+                    Toast.makeText(TravelCatalogMain.this, R.string.deletion_confirmed, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(TravelCatalogMain.this, R.string.deletion_failed, Toast.LENGTH_SHORT).show();
+                }
             }
         });
-        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        // Show a confirmation dialogue before deleting all database items.
+        alertDialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (dialogInterface != null) {
@@ -205,6 +194,11 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
         (alertDialogBuilder.create()).show();
     }
 
+    /**
+     * @param id for the row in question
+     * @param args not currently used
+     * @return returns the a new Cursor Loader for travel items.
+     */
     @Override
     public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = {
@@ -212,11 +206,6 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
                 TravelContract.TravelEntry.COLUMN_NAME,
                 TravelContract.TravelEntry.COLUMN_PRICE,
                 TravelContract.TravelEntry.COLUMN_QUANTITY
-//                ,
-//                TravelContract.TravelEntry.COLUMN_CATEGORY,
-//                TravelContract.TravelEntry.COLUMN_SEASON,
-//                TravelContract.TravelEntry.COLUMN_SUPPLIER,
-//                TravelContract.TravelEntry.COLUMN_SUPPLIER_PHONE
         };
         return new CursorLoader(this,
                 TravelContract.TravelEntry.CONTENT_URI,

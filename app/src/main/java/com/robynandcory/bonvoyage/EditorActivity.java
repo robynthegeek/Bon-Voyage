@@ -1,24 +1,24 @@
 package com.robynandcory.bonvoyage;
 
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Loader;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,19 +26,20 @@ import android.widget.Toast;
 import com.robynandcory.bonvoyage.data.TravelContract;
 import com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
 
-import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * Credit for reference for phone number https://stackoverflow.com/questions/8196771/format-a-string-using-regex-in-java
+ * Allows user to view and edit existing items, and add new items depending on whether the
+ * Add item or Edit button is clicked.
+ * Credit for reference for phone number:
+ * https://stackoverflow.com/questions/8196771/format-a-string-using-regex-in-java
  * https://stackoverflow.com/questions/30138159/check-sms-and-dial-support-before-intent
  */
 
 public class EditorActivity extends AppCompatActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
 
-
-    public static final String LOG_TAG = EditorActivity.class.getSimpleName();
-
+    // Version for Loader
     private static final int TRAVEL_ITEM_LOADER = 1;
 
     private EditText mNameEditText;
@@ -77,45 +78,125 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
             }
         });
 
+        // If the user was referred by an intent, set the title to match Editor mode.
+        Intent editIntent = getIntent();
+        mCurrentUri = editIntent.getData();
+        if (mCurrentUri != null) {
+            createEditor(mCurrentUri);
+        } else {
+            this.setTitle(getString(R.string.add_item));
+        }
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_editor_activity_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks, allows user to delete single item record from database
+        switch (item.getItemId()) {
+            case R.id.action_delete_entry:
+                deleteItemEntry();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * If user is sent to EditorActivity by an intent, extract the URI and build Editor mode
+     * @param uri of the item the user has selected.
+     */
+    private void createEditor(Uri uri) {
+        this.setTitle(getString(R.string.edit_item));
+        TextView editorTitle = findViewById(R.id.editor_text_title);
+        editorTitle.setText(R.string.edit_stock_item);
+        getLoaderManager().initLoader(TRAVEL_ITEM_LOADER, null, this);
+
+        // Locate Reorder button and set up intent to dial phone number of supplier
         Button reorderButton = findViewById(R.id.reorder_button);
+        reorderButton.setVisibility(View.VISIBLE);
         reorderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent dialerIntent = new Intent(Intent.ACTION_DIAL);
                 if (itemSupplierPhone != null) {
-                    dialerIntent.setData(Uri.parse("tel:" +itemSupplierPhone));
+                    dialerIntent.setData(Uri.parse("tel:" + itemSupplierPhone));
                     PackageManager packageManager = view.getContext().getPackageManager();
                     List activities = packageManager.queryIntentActivities(dialerIntent, PackageManager.MATCH_DEFAULT_ONLY);
                     boolean dialerInstalled = activities.size() > 0;
                     if (dialerInstalled) {
                         startActivity(dialerIntent);
                     } else {
-                        Toast.makeText(EditorActivity.this, "Please install a phone application", Toast.LENGTH_LONG).show();
+                        // If user does not have a dialer installed, prompt them to install one
+                        // to use reorder functionality.
+                        Toast.makeText(EditorActivity.this, R.string.install_phone_application, Toast.LENGTH_LONG).show();
                     }
 
                 }
             }
         });
 
-        Intent editIntent = getIntent();
-        mCurrentUri = editIntent.getData();
-        if (mCurrentUri != null) {
-            createEditor(mCurrentUri);
-        } else {
-            this.setTitle("Add an Item");
-        }
+        /**
+         * Creates button to decrease stock amount by one unless amount is 0
+         */
+        Button decrementButton = findViewById(R.id.decrement_button);
+        decrementButton.setVisibility(View.VISIBLE);
+        decrementButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int quantityInt = Integer.valueOf(mQuantityEditText.getText().toString());
+                if (quantityInt > 0 && mCurrentUri != null) {
+                    quantityInt -= 1;
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(TravelEntry.COLUMN_QUANTITY, quantityInt);
+                    int rowsUpdated = getContentResolver().update(mCurrentUri,
+                            contentValues,
+                            null,
+                            null);
+                    if (rowsUpdated == 0) {
+                        Toast.makeText(EditorActivity.this, R.string.error_saving, Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(EditorActivity.this, R.string.cannot_set_negative_amount, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
+        /**
+         * Creates button to increase stock amount by one unless amount is 0
+         */
+        Button incrementButton = findViewById(R.id.increment_button);
+        incrementButton.setVisibility(View.VISIBLE);
+        incrementButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int quantityInt = Integer.valueOf(mQuantityEditText.getText().toString());
+                if (quantityInt < 999 && mCurrentUri != null) {
+                    quantityInt += 1;
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(TravelEntry.COLUMN_QUANTITY, quantityInt);
+                    int rowsUpdated = getContentResolver().update(mCurrentUri,
+                            contentValues,
+                            null,
+                            null);
+                    if (rowsUpdated == 0) {
+                        Toast.makeText(EditorActivity.this, R.string.error_saving, Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(EditorActivity.this, R.string.cannot_set_amount_over_999, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
-    private void createEditor(Uri uri) {
-        this.setTitle("Edit Item");
-        TextView editorTitle = findViewById(R.id.editor_text_title);
-        editorTitle.setText("Edit Stock Item");
-        getLoaderManager().initLoader(TRAVEL_ITEM_LOADER, null, this);
-
-
-    }
-
+    /**
+     * Creates the category and season spinners
+     */
     private void createSpinners() {
         ArrayAdapter categorySpinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.array_category_options, android.R.layout.simple_spinner_item);
@@ -176,6 +257,11 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
         });
     }
 
+    /**
+     * Retrieves the user-entered Data from the EditText fields and spinners, checks for empty
+     * fields, and sanity checks entered data.  If data is acceptable, writes to DB using
+     * Content Resolver.
+     */
     private void saveItemData() {
         String nameString = mNameEditText.getText().toString().trim();
         String priceString = mPriceEditText.getText().toString().replaceAll("[^0-9]", "");
@@ -187,36 +273,39 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
         //check to see if any of the input strings are empty before saving.
         if (nameString.isEmpty() || priceString.isEmpty() || quantityString.isEmpty() ||
                 supplierString.isEmpty() || supplierPhoneString.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields before saving.",
+            Toast.makeText(this, R.string.fill_before_saving,
                     Toast.LENGTH_LONG).show();
             return;
         }
 
         //if all strings contain data, attempt to save the data.
         try {
+            //Clean price and phone strings of added symbols, leaving digits.
             String priceStringCleaned = priceString.replaceAll("[^0-9]", "");
             int priceInteger = Integer.parseInt(priceStringCleaned);
             int quantityInteger = Integer.parseInt(quantityString);
             String supplierPhoneCleaned = supplierPhoneString.replaceAll("[^0-9]", "");
 
+            // Check for standard US phone length.
             if (supplierPhoneCleaned.length() != 10) {
-                Toast.makeText(this, "Please enter a 10 digit US phone number.",
+                Toast.makeText(this, R.string.enter_us_phone,
                         Toast.LENGTH_LONG).show();
                 return;
             }
 
             if (quantityString.length() > 3) {
-                Toast.makeText(this, "Maximum stock quantity is 999.",
+                Toast.makeText(this, R.string.maximum_stock_quantity,
                         Toast.LENGTH_LONG).show();
                 return;
             }
 
             if (priceInteger > 99999) {
-                Toast.makeText(this, "Maximum item price is $999.99.",
+                Toast.makeText(this, R.string.maximum_price,
                         Toast.LENGTH_LONG).show();
                 return;
             }
 
+            //Add sanity checked values to the ContentValues
             ContentValues contentValues = new ContentValues();
             contentValues.put(TravelContract.TravelEntry.COLUMN_NAME, nameString);
             contentValues.put(TravelContract.TravelEntry.COLUMN_PRICE, priceInteger);
@@ -232,33 +321,59 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
                         null,
                         null);
                 if (rowsUpdated == 0) {
-                    Toast.makeText(this, "Error saving your item.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.error_saving, Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(this, "Your item has been added.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.item_saved, Toast.LENGTH_SHORT).show();
                     finish();
                 }
             } else {
                 Uri newUri = getContentResolver().insert(TravelContract.TravelEntry.CONTENT_URI, contentValues);
                 if (newUri == null) {
-                    Toast.makeText(this, "Error saving your item.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.error_saving, Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(this, "Your item has been added.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.item_saved, Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
-            Log.e(LOG_TAG, "This is what was entered" + contentValues);
-            // NavUtils.navigateUpFromSameTask(this);
-
+            // If user entered numbers are malformed, show a toast to alert them.
         } catch (
-                NumberFormatException e)
-
-        {
-            Toast.makeText(this, "Please enter a valid number",
+                NumberFormatException e) {
+            Toast.makeText(this, R.string.enter_valid_number,
                     Toast.LENGTH_LONG).show();
         }
-
-
     }
+
+    /**
+     * Allows user to delete all entries from the settings menu.
+     */
+    private void deleteItemEntry() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage(R.string.confirm_deletion);
+        alertDialogBuilder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                int rowsDeleted = getContentResolver().delete(mCurrentUri,
+                        null, null);
+                if (rowsDeleted > 0) {
+                    Toast.makeText(EditorActivity.this, R.string.deletion_confirmed, Toast.LENGTH_LONG).show();
+                    finish();
+                } else {
+                    Toast.makeText(EditorActivity.this, R.string.deletion_failed, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        // Show a confirmation dialogue before deleting all database items.
+        alertDialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null) {
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+        (alertDialogBuilder.create()).show();
+    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -297,7 +412,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
 
 
             String itemName = cursor.getString(nameColumnIndex);
-            String itemPrice = cursor.getString(priceColumnIndex);
+            int itemPrice = cursor.getInt(priceColumnIndex);
             int itemQuantity = cursor.getInt(quantityColumnIndex);
             int itemCategory = cursor.getInt(categoryColumnIndex);
             int itemSeason = cursor.getInt(seasonColumnIndex);
@@ -337,21 +452,33 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
         }
     }
 
-    private String formatPhoneNumber (String itemSupplierPhone){
+    /**
+     * Formats the phone number in format 6505551296 to (650) 555-1296
+     * @param itemSupplierPhone cleaned string from database
+     * @return correctly formatted phone number String
+     */
+    private String formatPhoneNumber(String itemSupplierPhone) {
         StringBuilder stringBuilder = new StringBuilder(itemSupplierPhone)
-                .insert(0,"(")
-                .insert(4,")")
-                .insert(8,"-");
+                .insert(0, "(")
+                .insert(4, ")")
+                .insert(8, "-");
         String formattedPhoneNumber = stringBuilder.toString();
         return formattedPhoneNumber;
     }
 
-    private String formatPrice (String intPrice) {
-        return intPrice.replaceFirst("(\\d{3})(\\d{3})(\\d+)", "($1) $2-$3");
+    /**
+     * Formats the price from cents to dollars and cents.
+     * @param intPrice cleaned int from database
+     * @return Price in US dollar format, e.g. $8.99
+     */
+    private String formatPrice(int intPrice) {
+        int dollars = intPrice / 100;
+        int cents = intPrice % 100;
+        return String.format(Locale.US, "$%d.%02d", dollars, cents);
     }
-
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        //when loader resets, clear all fields.
         mNameEditText.setText("");
         mPriceEditText.setText("");
         mQuantityEditText.setText("");
