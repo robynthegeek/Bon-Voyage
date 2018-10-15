@@ -29,6 +29,7 @@ import com.robynandcory.bonvoyage.data.TravelContract.TravelEntry;
 import java.util.List;
 import java.util.Locale;
 
+
 /**
  * Allows user to view and edit existing items, and add new items depending on whether the
  * Add item or Edit button is clicked.
@@ -60,6 +61,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor_layout);
 
+        //Locate all item views
         mNameEditText = findViewById(R.id.edit_item_name);
         mPriceEditText = findViewById(R.id.edit_item_price);
         mQuantityEditText = findViewById(R.id.edit_item_quantity);
@@ -70,6 +72,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
 
         createSpinners();
 
+        //set ClickListener on Save button
         Button saveButton = findViewById(R.id.save_item_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,7 +81,8 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
             }
         });
 
-        // If the user was referred by an intent, set the title to match Editor mode.
+        // If the user was referred by an intent, set the title to match Editor mode and add the
+        // views for editing, otherwise, use the default title.
         Intent editIntent = getIntent();
         mCurrentUri = editIntent.getData();
         if (mCurrentUri != null) {
@@ -86,7 +90,6 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
         } else {
             this.setTitle(getString(R.string.add_item));
         }
-
     }
 
     @Override
@@ -109,6 +112,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
 
     /**
      * If user is sent to EditorActivity by an intent, extract the URI and build Editor mode
+     *
      * @param uri of the item the user has selected.
      */
     private void createEditor(Uri uri) {
@@ -136,7 +140,6 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
                         // to use reorder functionality.
                         Toast.makeText(EditorActivity.this, R.string.install_phone_application, Toast.LENGTH_LONG).show();
                     }
-
                 }
             }
         });
@@ -204,6 +207,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         mCategorySpinner.setAdapter(categorySpinnerAdapter);
         mCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
             @Override
             public void onItemSelected(AdapterView<?> categoryAdapterView, View view, int i, long l) {
                 String selection = (String) categoryAdapterView.getItemAtPosition(i);
@@ -292,13 +296,13 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
                         Toast.LENGTH_LONG).show();
                 return;
             }
-
+            //Ensure maximum stock quantity does not exceed 999
             if (quantityString.length() > 3) {
                 Toast.makeText(this, R.string.maximum_stock_quantity,
                         Toast.LENGTH_LONG).show();
                 return;
             }
-
+            //Ensure maximum price does not exceed $999.99 (99999 cents)
             if (priceInteger > 99999) {
                 Toast.makeText(this, R.string.maximum_price,
                         Toast.LENGTH_LONG).show();
@@ -374,7 +378,6 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
         (alertDialogBuilder.create()).show();
     }
 
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = {
@@ -424,18 +427,22 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
             mQuantityEditText.setText(Integer.toString(itemQuantity));
             mSupplierEditText.setText(itemSupplier);
             mSupplierPhoneEditText.setText(formatPhoneNumber(itemSupplierPhone));
-
             switch (itemCategory) {
                 case TravelEntry.COLUMN_ITEM_CATEGORY_TECHNOLOGY:
                     mCategorySpinner.setSelection(1);
+                    break;
                 case TravelEntry.COLUMN_ITEM_CATEGORY_CLOTHING:
                     mCategorySpinner.setSelection(2);
+                    break;
                 case TravelEntry.COLUMN_ITEM_CATEGORY_TOILETRIES:
                     mCategorySpinner.setSelection(3);
+                    break;
                 case TravelEntry.COLUMN_ITEM_CATEGORY_ACCESSORIES:
                     mCategorySpinner.setSelection(4);
+                    break;
                 case TravelEntry.COLUMN_ITEM_CATEGORY_LUGGAGE:
                     mCategorySpinner.setSelection(5);
+                    break;
                 default:
                     mCategorySpinner.setSelection(0);
                     break;
@@ -443,8 +450,10 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
             switch (itemSeason) {
                 case TravelEntry.COLUMN_ITEM_SEASON_COLD:
                     mSeasonSpinner.setSelection(1);
+                    break;
                 case TravelEntry.COLUMN_ITEM_SEASON_HOT:
                     mSeasonSpinner.setSelection(2);
+                    break;
                 default:
                     mSeasonSpinner.setSelection(0);
                     break;
@@ -453,7 +462,8 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
     }
 
     /**
-     * Formats the phone number in format 6505551296 to (650) 555-1296
+     * Formats the phone number in format 6505551234 to (650) 555-1234
+     *
      * @param itemSupplierPhone cleaned string from database
      * @return correctly formatted phone number String
      */
@@ -462,12 +472,12 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
                 .insert(0, "(")
                 .insert(4, ")")
                 .insert(8, "-");
-        String formattedPhoneNumber = stringBuilder.toString();
-        return formattedPhoneNumber;
+        return stringBuilder.toString();
     }
 
     /**
      * Formats the price from cents to dollars and cents.
+     *
      * @param intPrice cleaned int from database
      * @return Price in US dollar format, e.g. $8.99
      */
@@ -476,6 +486,7 @@ public class EditorActivity extends AppCompatActivity implements android.app.Loa
         int cents = intPrice % 100;
         return String.format(Locale.US, "$%d.%02d", dollars, cents);
     }
+
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         //when loader resets, clear all fields.

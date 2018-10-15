@@ -71,8 +71,7 @@ public class TravelContract {
         public static final int COLUMN_ITEM_CATEGORY_TOILETRIES = 3;
         public static final int COLUMN_ITEM_CATEGORY_ACCESSORIES = 4;
         public static final int COLUMN_ITEM_CATEGORY_LUGGAGE = 5;
-        //public static final int DOCUMENTS = ?;
-        //public static final int OUTDOOR = ?;
+
         public static final int CATEGORY_MAX = 5;
 
         //check for valid category  and allow categories to expand if new item categories are added.

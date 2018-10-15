@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,8 +59,6 @@ public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapte
                 int cursorItemId = cursor.getInt(cursor.getColumnIndex(TravelEntry._ID));
                 //contentUri of single item
                 final Uri contentUri = Uri.withAppendedPath(TravelEntry.CONTENT_URI, Integer.toString(cursorItemId));
-                Log.e("BindViewMethod: ", "This is the content URI: " + contentUri);
-
                 Button saleButton = view.findViewById(R.id.sale_button);
                 saleButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -126,14 +123,14 @@ public class TravelCursorAdapter extends RecyclerView.Adapter<TravelCursorAdapte
          * Set onClickListener on the cardView, when clicked open the detail view for given item
          * and pass the Uri in as Intent data.
          *
-         * @param view
+         * @param view the view the user has selected.
          */
         travelHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    Intent intent = new Intent(context, EditorActivity.class);
-                    intent.setData(intentUri);
-                    context.startActivity(intent);
+                Intent intent = new Intent(context, EditorActivity.class);
+                intent.setData(intentUri);
+                context.startActivity(intent);
             }
         });
     }

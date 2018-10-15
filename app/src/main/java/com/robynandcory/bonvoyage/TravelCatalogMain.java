@@ -26,9 +26,9 @@ import com.robynandcory.bonvoyage.data.TravelDbHelper;
 
 /**
  * Project 8 for Udacity ABND
- *
+ * <p>
  * Current app contains a single SQLite table to store inventory information for a travel store.
- *
+ * <p>
  * References:
  * https://github.com/udacity/ud845-Pets
  * https://stackoverflow.com/questions/28217436/how-to-show-an-empty-view-with-a-recyclerview
@@ -166,6 +166,7 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
 
     /**
      * Allows user to delete all entries from the settings menu.
+     * Prompts for confirmation first.
      */
     private void deleteAllEntries() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -195,7 +196,7 @@ public class TravelCatalogMain extends AppCompatActivity implements android.app.
     }
 
     /**
-     * @param id for the row in question
+     * @param id   for the row in question
      * @param args not currently used
      * @return returns the a new Cursor Loader for travel items.
      */

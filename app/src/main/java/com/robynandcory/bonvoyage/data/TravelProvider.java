@@ -7,7 +7,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.strictmode.SqliteObjectLeakedViolation;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -121,7 +120,6 @@ public class TravelProvider extends ContentProvider {
         if (price == null || price < 0 || price > 99999) {
             throw new IllegalArgumentException("Price greater than 0 is required");
         }
-        Log.e(LOG_TAG, "Price as integer going into DB is: " + price);
         //Quantity limited to between 0 and 100 stock items.
         Integer quantity = contentValues.getAsInteger(TravelEntry.COLUMN_QUANTITY);
         if (quantity == null || quantity < 0 || quantity > 999) {
@@ -199,6 +197,7 @@ public class TravelProvider extends ContentProvider {
                 throw new IllegalArgumentException("Cannot insert data: " + uri);
         }
     }
+
     /**
      * Updates the given row or entire DB for the input URI.
      * Check for the presence of each Key, then throw error if provider receives a null value
@@ -259,7 +258,7 @@ public class TravelProvider extends ContentProvider {
          * Write the santity checked values to the DB only if new data has been entered.
          */
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
-        int rowsUpdated =  database.update(TravelEntry.TABLE_NAME, contentValues, selection, selectionArgs);
+        int rowsUpdated = database.update(TravelEntry.TABLE_NAME, contentValues, selection, selectionArgs);
 
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
